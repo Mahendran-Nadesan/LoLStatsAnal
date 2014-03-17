@@ -1,0 +1,9 @@
+LoLStatsAnalyser
+
+A GUI app storing some League of Legends Stats
+
+Created: 12/03/2014
+
+The app has 2 main components:
+- A GUI which displays stats
+- A real-time stats collector (using Riot's API)
