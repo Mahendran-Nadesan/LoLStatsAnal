@@ -3,7 +3,8 @@
 #
 # To do:
 # Add a predictor (maybe like the twitter project)
-
+# http://fantasy.lolesports.com/en-US/join/league/41985/0wgEsQ5IgRf2Pc4n1eTQ
+# http://fantasy.lolesports.com/en-US/join/league/41985/0wgEsQ5IgRf2Pc4n1eTQ
 
 '''
 CSV Columns: 
@@ -243,7 +244,7 @@ for champ_num, champ in enumerate(champs):
         for game in all_stats:
                 
                 # champ win/losses based on side
-                if game[1] == champ and game[5] != "loss prevented":
+                if game[1] == champ and game[5] != "lossprevented":
                         champ_games[champ_num].append(game)
                         cgames += 1
                         if game[2] == 'blue' and game[5] == 'win':
@@ -294,7 +295,11 @@ for champ_num, champ in enumerate(champs):
                         if game[3] != '-':
                                 champ_time_s[champ_num].append(game[4])
                                 champ_time_m[champ_num].append(game[3])
+                                
                                 champ_time_all[champ_num].append(int(game[3])*60 + int(game[4]))
+                                champ_time_cum[champ_num].append(sum(champ_time_all[champ_num]))
+                                champ_time_ave[champ_num].append(round((champ_time_cum[champ_num][-1])/len(champ_time_cum[champ_num]),2))
+                        
         
         ckills = 0
         cdeaths = 0
@@ -442,7 +447,7 @@ print "Purple wr%: ",round((tpurple_wins*100)/(len(total_wl_purple)),2)
 ##pyplot.plot(total_wl_purple,'r')
 ##pyplot.show()
 
-picdir = "C:/Riot Games/League of Legends/RADS/projects/lol_air_client/releases/0.0.1.83/deploy/assets/images/champions"
+picdir = "C:/Riot Games/League of Legends/RADS/projects/lol_air_client/releases/0.0.1.88/deploy/assets/images/champions"
 ##print champ_
-mygui = GraphGui(picdir, champs, champ_total_kda, champ_wr, brpr_text, "GUI")
+mygui = GraphGui(picdir, champs, champ_total_kda, champ_wr, brpr_text, champ_time_ave, "GUI")
 mygui.mainloop()

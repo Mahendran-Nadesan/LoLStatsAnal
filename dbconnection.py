@@ -41,24 +41,33 @@ import collections
 		
 
 class aux_db:
-        def __init__(self, example_match, table_name):
-                self.example_match = example_match
+        def __init__(self, table_name):
+##                self.example_match = example_match
                 self.table_name = table_name
+                self.sql_command_history = []
+                self.arg_history = []
                 # self.initial_column_names = {'gameId': [], 'createDate': [], 'gameMode': [], 'mapId': [], 'gameType': [], 'subType': [], 'gameResult': []}
                 # self.list_initial_column_names = list(self.initial_column_names)
-                self.list_initial_column_names = ['gameID', 'createDate', 'gameMode', 'mapID', 'gameType', 'subType', 'gameResult']
 
-        def make_db_string(self, column_names):
-                self.base_string = str()
-                self.col_names = str()
-                for i in column_names:
-                        self.col_names = self.col_names + " {a} {col_name},".format(a="ADD COLUMN", col_name=i) 
-                        
-                return "CREATE TABLE {table} {exec_string}".format(table=self.table_name, exec_string=self.col_names)
+##        def make_db_string(self, column_names):
+##                self.base_string = str()
+##                self.col_names = str()
+##                for i in column_names:
+##                        self.col_names = self.col_names + " {a} {col_name},".format(a="ADD COLUMN", col_name=i) 
+##                        
+##                return "CREATE TABLE {table} {exec_string}".format(table=self.table_name, exec_string=self.col_names)
 
-        def sort_strings(self):
+        def create_string(self, sql_command, in_arg):
+                self.sql_command_history.append(sql_command)
+                self.arg_history.append(in_arg)
+                self.sql_command = sql_command
+                self.arg = in_arg
+                return "{sqlcomm} {table} {exec_string}".format(sqlcomm=self.sql_command, table=self.table_name, exec_string=self.arg)
+
+        def create_colname_strings(self):
                 # Put in initial column names with champ number modifiers
                 self.temp_column_names = {}
+                self.list_initial_column_names = ['gameID', 'createDate', 'gameMode', 'mapID', 'gameType', 'subType', 'gameResult']
                 c_string = "champ"
                 bool_type = "<type \'bool\'>"
                 int_type = "<type \'int\'>"
@@ -87,8 +96,14 @@ class aux_db:
                 for col_name in self.list_temp_column_names:
                         self.list_initial_column_names.append(col_name)
                 
-                                
-                return self.make_db_string(self.list_initial_column_names)
+                # Iterate and add to string
+                self.base_string = str()
+                self.col_names = str()
+                for i in self.list_initial_column_names:
+                        self.col_names = self.col_names + " {a} {col_name},".format(a="ADD COLUMN", col_name=i)
+
+                return self.col_names
+##                return self.make_db_string(self.list_initial_column_names)
                                 
                         
                         

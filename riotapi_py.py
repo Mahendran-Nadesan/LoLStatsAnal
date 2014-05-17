@@ -30,8 +30,12 @@ class riotapi_py:
         def get_summoner_by_name(self, summoner_list, static=False):
                 return self.send_request(self.versions['gsbn']+"/summoner/by-name/{names}".format(names=",".join([summoner_list]))) 
 
-        def get_summoner_by_id(self, summonerid_list, static=False):
-                return self.send_request(self.versions['gsbid']+"/summoner/{ids}".format(ids=",".join(summonerid_list)))
+        def get_summoner_by_id(self, summoner_list, static=False):
+##                summonerid_list = []
+##                summoner_list = [summoner_list]
+##                for summoner in summoner_list:
+##                        summonerid_list.append(str(summoner))
+                return self.send_request(self.versions['gsbid']+"/summoner/{ids}".format(ids=",".join([str(i) for i in summoner_list])))
 
         def get_games_by_name(self, summoner_list, static=False):
                 summonerid_list = []
@@ -39,9 +43,9 @@ class riotapi_py:
                 for name in summoner_list:
                         summoner = self.get_summoner_by_name(name)
                         summonerid_list.append(str(summoner[summoner.keys()[0]]['id']))
-                return self.get_games_by_id(summonerid_list)
+                return self.get_games_by_summoner_id(summonerid_list)
        
-        def get_games_by_id(self, summonerid_list, static=False):
+        def get_games_by_summoner_id(self, summonerid_list, static=False):
                 return self.send_request(self.versions['ggbid']+"/game/by-summoner/{ids}/recent".format(ids=",".join(summonerid_list)))
 
         

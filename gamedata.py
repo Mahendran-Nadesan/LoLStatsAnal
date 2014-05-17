@@ -12,5 +12,14 @@ class grabgamedata:
         self.all_game_ids = []
         for game in self.raw_games:
             self.all_game_ids.append(game['gameId'])
+
+    def get_summoner_ids(self, match):
+        self.summoner_ids = []
+        for players in match['fellowPlayers']:
+            self.summoner_ids.append(players['summonerId'])
+        return self.summoner_ids
+
+##    def 
+        
         
         

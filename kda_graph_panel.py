@@ -27,7 +27,7 @@ from operator import itemgetter
 
 # GUI Class
 class GraphGui(tk.Frame):
-	def __init__(self, picdir, champlist, kdalist, wrlist, brprlist, title, master=None):
+	def __init__(self, picdir, champlist, kdalist, wrlist, brprlist, durlist, title, master=None):
 		tk.Frame.__init__(self)
 		# self.master = master
 		self.picdir = picdir
@@ -35,6 +35,7 @@ class GraphGui(tk.Frame):
 		self.kdalist = kdalist
 		self.wrlist = wrlist
 		self.brprlist = brprlist
+		self.durlist = durlist
 		self.master.title(title)
 		
 		self.generate_pics()
@@ -43,6 +44,7 @@ class GraphGui(tk.Frame):
 		self.text_label = []
 		self.wr_label = []
 		self.side_wr_label = []
+		self.dur_label = []
 		
 		for i, j in enumerate(self.champlist):
 			self.create_entry(i)
@@ -63,7 +65,12 @@ class GraphGui(tk.Frame):
                 pyplot.plot(self.wrlist[i])
                 pyplot.title(self.champlist[i] + " win rate")
                 pyplot.show()
-	
+
+	def on_click_dur(self, i):
+                pyplot.plot(self.durlist[i])
+                pyplot.title(self.champlist[i] + " duration")
+                pyplot.show()
+                
 	# def find_champ(self, i):
 		# return self.champ(i[0])
 		
@@ -102,6 +109,9 @@ class GraphGui(tk.Frame):
 		
 		self.side_wr_label.append(tk.Label(self.new_frame[f], width=20, relief="sunken", text=self.brprlist[i]))
 		self.side_wr_label[i].pack(side="left", padx=5)
+
+		self.dur_label.append(tk.Button(self.new_frame[f], text="dur", command=lambda i=i : self.on_click_dur(i)))
+		self.dur_label[i].pack(side="left", padx=5)
 		
 		return self.new_frame[f]
 		
