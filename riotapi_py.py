@@ -1,39 +1,76 @@
-# Riot API for Python
-# Initial API wrapper for my purposes/tests
-# Current key: e20154f8-3601-40ac-ae35-5af13e62cc8c (mn.norm.reg@gmail.com)
-#
-# 31/5:
-# -     by_name and by_id now accept multiple or single names/ids, as long as multiples are couched in a list.
-#       That needs a fix, dealing with **kwargs (issue is that "static=False" follows)
-
+"""
+Riot API for Python
+Initial API wrapper for my purposes/tests Current key:
+e20154f8-3601-40ac-ae35-5af13e62cc8c (mn.norm.reg@gmail.com) 31/5:  -
+by_name and by_id now accept multiple or single names/ids, as long as
+multiples are couched in a list. That needs a fix, dealing with
+**kwargs (issue is that"static=False" follows)
+"""
 
 # Imports
 import requests
+import time
+import collections
 
+class RateLimit:
+        """ Taken from https://github.com/pseudonym117/Riot-Watcher/blob/master/riotwatcher.py"""
+        def __init__(self, allowed_requests, seconds):
+            self.allowed_requests = allowed_requests
+            self.seconds = seconds
+            self.made_requests = collections.deque()
 
-class riotapi_py:
-        def __init__(self, api_key, rate_limit, versions, default_region="euw"):
+        def __reload(self):
+            t = time.time()
+            while len(self.made_requests) > 0 and self.made_requests[0] < t:
+                self.made_requests.popleft()
+
+        def add_request(self):
+            self.made_requests.append(time.time() + self.seconds)
+
+        def can_request(self):
+            self.__reload()
+            return len(self.made_requests) < self.allowed_requests
+                     
+
+class RiotApiPy:
+        """ Main API for the Riot API, handling requests and returning
+        limited stats. Currently supports only player stats."""
+
+        def __init__(self, api_key, versions, region, limits = (RateLimit(10,
+        10), RateLimit(500,600), ),default_region="euw"):
                 self.api_key = api_key
                 self.default_region = default_region
-                self.region = self.default_region
-                self.rate_limit = rate_limit
+                self.region = region
                 self.versions = versions
-                self.base_url = "https://prod.api.pvp.net/api/lol/"
+                self.limits = limits
+                self.base_url = "https://{region}.api.pvp.net/api/lol/".format(region=self.region)
+                                
 
         def __str__(self):
-                pass
+                self.info = {'api_key': self.api_key, 'default_region': self.default_region
+                             , 'region': self.region, 'rate_limit':
+                             self.limits, 'versions':
+                             self.versions}
+                return self.info.__str__()
 
         def send_request(self, request, static=False, **kwargs):
                 if self.region is None:
                         self.region = self.default_region
-                self.r = requests.get(self.base_url+"{static}{region}/{request}?api_key={key}".format(static='static/' if static else '', region=self.region, request=request, key=self.api_key))
+                self.r = requests.get(self.base_url+"{static}{region}/{request}?api_key={key}".format(static='static/'
+                if static else '', region=self.region,
+                request=request, key=self.api_key))
+                for lim in self.limits:
+                    if lim.can_request():
+                        lim.add_request()
+                    else:
+                        pass #??
                 return self.r.json()
 
         def get_summoners_by_name(self, summoner_list, static=False):
                 if str(type(summoner_list)) == "<type \'list\'>":
-                        pass
+                    pass
                 else:
-                        summoner_list = [summoner_list, ]
+                    summoner_list = [summoner_list, ]
                 return self.send_request(self.versions['gsbn']+"/summoner/by-name/{names}".format(names=",".join([str(i) for i in summoner_list]))) 
 
         def get_summoners_by_id(self, summoner_list, static=False):

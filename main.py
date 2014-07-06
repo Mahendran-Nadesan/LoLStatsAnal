@@ -1,10 +1,10 @@
-# Temporary main file # # Call the riotapi_py # Sort it into a main 
+# Temporary main file # # Call the RiotApiPy # Sort it into a main 
 # var/dict # Call/Write to database # Call GUI 
 
 # Imports 
-from riotapi_py import riotapi_py 
+from riotapi_py import RiotApiPy 
 from gamedata import grabgamedata 
-##import dbconnection from dbconnection import aux_db 
+from dbconnection import aux_db 
 import MySQLdb
 import collections 
 
@@ -14,15 +14,15 @@ import collections
 #########################################################
 ##import lolapp_gui 
 
-# riotapi_py 
-# Later, code regions into riotapi_py
+# RiotApiPy 
+# Later, code regions into RiotApiPy
+# Add RiotLimit...
 api_key = "e20154f8-3601-40ac-ae35-5af13e62cc8c" 
 region = "euw" 
-rate_limit = 5 
 versions = {"gsbn": "v1.4", "gsbid": "v1.4", "ggbid": "v1.3"} 
 
-api_instance = riotapi_py(api_key, rate_limit, versions, region) 
-##api_instance = riotapi_py() 
+api_instance = RiotApiPy(api_key, versions, region) 
+##api_instance = RiotApiPy() 
 
 # Get details 
 # Get main summoner 
@@ -71,22 +71,66 @@ mygamedata.get_summoner_ids(example_match)
                 
         
 # Test functions
-currgame = mygamedata.all_game_ids[0]
-all_stats = []
-all_stats.append(mygamedata.get_same_game(currgame))
+##currgame = mygamedata.all_game_ids[0]
+##all_stats = []
+##all_stats.append(mygamedata.get_same_game(currgame))
+##
+##print "Starting data retrieval"
+##for i in mygamedata.summoner_ids[currgame]:
+##    playergames = api_instance.get_games_by_summoner_id(i)
+##    gamedata = grabgamedata(playergames)
+##    if gamedata.can_find_same_game(currgame) == True:
+##        all_stats.append(gamedata.get_same_game(currgame))
+##    else:
+##        print "This game not found for this player: {p}.".format(p=i)
+##        
+##
+##            
+##print all_stats[0].keys()
+##for i in all_stats:
+##	print "Champ: {c} Kills: {k} Deaths: {d} Assists: {a}".format(c=i['ChampionID'], k=i['championsKilled'], d=i['numDeaths'], a=i['assists'])
 
-for i in mygamedata.summoner_ids[currgame]:
-    playergames = api_instance.get_games_by_summoner_id(i)
-    gamedata = grabgamedata(playergames)
-    if gamedata.can_find_same_game(currgame) == True:
-        all_stats.append(gamedata.get_same_game(currgame))
-    else:
-        print "This game not found for this player."
 
+# Some pseudocode:
+##for game in allthegames:
+##    game_player_data = []
+##    for summonerid in allsummoners:
+##        get all the ids:
+##            find the same game
+##            append the game
+##    write the data to db (basically, in groups of 10)            
+        
+# Bigger test (without the db check for redundant game_ids)
+db_name = "LoLStatsApp"
+db = MySQLdb.connect("127.0.0.1","root","","") 
+cursor = db.cursor()
+cursor.execute("USE {s}".format(s=db_name))
+table = aux_db("MatchPlayerDetails", cursor)
+
+for game_num, game in enumerate(mygamedata.all_game_ids):
+    mygamedata.get_summoner_ids(mygamedata.raw_games[game_num])
+    all_stats = []
+    all_stats.append(mygamedata.get_same_game(game))
+    print "Data retrieval game {num}".format(num=game)
+    for i in mygamedata.summoner_ids[game]:
+        playergames = api_instance.get_games_by_summoner_id(i)
+        gamedata = grabgamedata(playergames)
+        if gamedata.can_find_same_game(game) == True:
+            all_stats.append(gamedata.get_same_game(game))
             
-print all_stats[0].keys()
-for i in all_stats:
-	print "Champ: {c} Kills: {k} Deaths: {d} Assists: {a}".format(c=i['ChampionID'], k=i['championsKilled'], d=i['numDeaths'], a=i['assists'])
+        else:
+            print "This game not found for this player: {p}.".format(p=i)
+    print "-----------------"
+    print " Game {num}    ".format(num=game)
+    print "-----------------"
+    for i in all_stats:
+        print "Champ: {c} Kills: {k} Deaths: {d} Assists: {a}".format(c=i['ChampionID'], k=i['championsKilled'], d=i['numDeaths'], a=i['assists'])
+        table.write_to_db("insert_string", i)
+
+db.commit()
+    
+                     
+                     
 
 
 ##for i, k in enumerate(all_stats):
