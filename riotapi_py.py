@@ -54,16 +54,19 @@ class RiotApiPy:
                 return self.info.__str__()
 
         def send_request(self, request, static=False, **kwargs):
-                if self.region is None:
-                        self.region = self.default_region
-                self.r = requests.get(self.base_url+"{static}{region}/{request}?api_key={key}".format(static='static/'
-                if static else '', region=self.region,
-                request=request, key=self.api_key))
+                print str(request)
                 for lim in self.limits:
                     if lim.can_request():
                         lim.add_request()
                     else:
-                        pass #??
+                        print "nope"
+                if self.region is None:
+                        self.region = self.default_region
+                print self.region
+                self.r = requests.get("https://{proxy}.api.pvp.net/api/lol/{static}{region}/{req}?{secondary}api_key={key}".format(proxy="global" if static else self.region, static='static-data/'
+                if static else '', region=self.region,
+                req=str(request[0]), secondary=request[1], key=self.api_key))
+                
                 return self.r.json()
 
         def get_summoners_by_name(self, summoner_list, static=False):
@@ -71,14 +74,14 @@ class RiotApiPy:
                     pass
                 else:
                     summoner_list = [summoner_list, ]
-                return self.send_request(self.versions['gsbn']+"/summoner/by-name/{names}".format(names=",".join([str(i) for i in summoner_list]))) 
+                return self.send_request([self.versions['gsbn']+"/summoner/by-name/{names}".format(names=",".join([str(i) for i in summoner_list])), ""]) 
 
         def get_summoners_by_id(self, summoner_list, static=False):
                 if str(type(summoner_list)) == "<type \'list\'>":
                         pass
                 else:
                         summoner_list = [summoner_list, ]
-                return self.send_request(self.versions['gsbid']+"/summoner/{ids}".format(ids=",".join([str(i) for i in summoner_list])))
+                return self.send_request([self.versions['gsbid']+"/summoner/{ids}".format(ids=",".join([str(i) for i in summoner_list])), ""])
 
         def get_games_by_name(self, summoner, static=False):
                 summoner = self.get_summoners_by_name(summoner)
@@ -90,7 +93,21 @@ class RiotApiPy:
                         pass
                 else:
                         summonerid_list = [summonerid_list]
-                return self.send_request(self.versions['ggbid']+"/game/by-summoner/{ids}/recent".format(ids=",".join([str(i) for i in summonerid_list])))
+                return self.send_request([self.versions['ggbid']+"/game/by-summoner/{ids}/recent".format(ids=",".join([str(i) for i in summonerid_list])), ""])
+
+        def get_ranked_stats_by_summoner_id(self, summonerid, season, static=False):
+                if str(type(summonerid))== "<type /'int\'>":
+                        pass
+                else:
+                        summonerid = int(summonerid)
+                return self.send_request([self.versions['grsbid']+"/stats/by-summoner/{ids}/ranked".format(ids=str(summonerid)), "season=SEASON{s}&".format(s=season)])
+
+        def static_get_champion_list(self):
+                return self.send_request([self.versions['sgcbid']+"/champion", ""], static=True)
+
+        def static_get_champion_by_id(self, championid):
+                return self.send_request([self.versions['sgcbid']+"/champion/{champ}".format(champ=str(championid)), ""], static=True)
+                
 
         
 

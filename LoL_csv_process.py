@@ -317,23 +317,23 @@ for champ_num, champ in enumerate(champs):
         champ_kda.append(kdat)
         ew_kda.append(round(((sum(ew_kdas[champ_num]))/max(len(ew_kdas[champ_num]),1)),2))
 
-        for game in champ_games[champ_num]:
-                if game[26] != '-':
-                        for i in range(26,31):
-##                                print i
-                                if game[i] not in champ_enemies[champ].keys():
-                                        champ_enemies[champ][game[i]] = {'games': 0, 'wins': 0, 'losses': 0}
-
-        
-        for game in champ_games[champ_num]:
-                if game[26] != '-':
-                        if game[5] != 'lossprevented':
-                                for i in range(26,31):
-                                        champ_enemies[champ][game[i]]['games'] += 1
-                                        if game[5] == 'win':
-                                                champ_enemies[champ][game[i]]['wins'] += 1
-                                        else:
-                                                champ_enemies[champ][game[i]]['losses'] += 1
+##        for game in champ_games[champ_num]:
+##                if game[26] != '-':
+##                        for i in range(26,31):
+####                                print i
+##                                if game[i] not in champ_enemies[champ].keys():
+##                                        champ_enemies[champ][game[i]] = {'games': 0, 'wins': 0, 'losses': 0}
+##
+##        
+##        for game in champ_games[champ_num]:
+##                if game[26] != '-':
+##                        if game[5] != 'lossprevented':
+##                                for i in range(26,31):
+##                                        champ_enemies[champ][game[i]]['games'] += 1
+##                                        if game[5] == 'win':
+##                                                champ_enemies[champ][game[i]]['wins'] += 1
+##                                        else:
+##                                                champ_enemies[champ][game[i]]['losses'] += 1
 
 
         
@@ -470,7 +470,7 @@ print "Purple wr%: ",round((tpurple_wins*100)/(len(total_wl_purple)),2)
 ##pyplot.plot(total_wl_purple,'r')
 ##pyplot.show()
 
-picdir = "C:/Riot Games/League of Legends/RADS/projects/lol_air_client/releases/0.0.1.98/deploy/assets/images/champions"
+picdir = "C:/Riot Games/League of Legends/RADS/projects/lol_air_client/releases/0.0.1.99/deploy/assets/images/champions"
 ##print champ_
 mygui = GraphGui(picdir, champs, champ_total_kda, champ_wr, brpr_text, champ_time_ave, "GUI")
 mygui.mainloop()

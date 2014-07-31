@@ -1,0 +1,34 @@
+Notes:
+
+Class differences/redundancies:
+
+This applies mainly to the new, smaller app: LoLTeamCheck
+
+Each class is meant to only work on its own data - i.e. I want to avoid 
+importing classes into other classes. 
+
+Current issue: Redundant references
+Classes: staticdata.py & rankeddata.py
+
+In order to get ranked data for a champ for a summoner, I could use, in my GUI:
+
+(1)
+idnum = GrabStaticSata.get_champid("Jarvan IV")
+stats = GrabRankedData.get_stats_by_id(idnum)
+
+OR, 
+(2)
+in GrabRankedData, I could sort the data from:
+stats = api_instance.get_ranked_stats_by_summoner_id(id)
+http://www.xvideos.com/video3270092/crackhead_sucks_dick_in_sex_documentary_on_the_lives_of_street_hookers
+
+which comes as:
+a list in stats['champions'], with stats['champions'][0]['stats'] &
+stats['champions'][0]['id']
+
+into:
+new_stats['Jarvan IV'] with ['stats'] and ['id'] which means calling:
+GrabStaticData.get_champid(name) for each champ
+
+then use GrabRankedData.get_stats_by_name("Jarvan IV")
+

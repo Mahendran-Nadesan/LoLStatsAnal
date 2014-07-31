@@ -1,10 +1,13 @@
 # Temporary main file # # Call the RiotApiPy # Sort it into a main 
 # var/dict # Call/Write to database # Call GUI 
 
-# Imports 
+# Imports
+from __future__ import division # must be first import
 from riotapi_py import RiotApiPy 
-from gamedata import grabgamedata 
-from dbconnection import aux_db 
+from gamedata import grabgamedata
+from staticdata import GrabStaticData
+from dbconnection import aux_db
+from rankeddata import GrabRankedData
 import MySQLdb
 import collections 
 
@@ -19,7 +22,7 @@ import collections
 # Add RiotLimit...
 api_key = "e20154f8-3601-40ac-ae35-5af13e62cc8c" 
 region = "euw" 
-versions = {"gsbn": "v1.4", "gsbid": "v1.4", "ggbid": "v1.3"} 
+versions = {"gsbn": "v1.4", "gsbid": "v1.4", "ggbid": "v1.3", "grsbid": "v1.3", "sgcbid": "v1.2"} 
 
 api_instance = RiotApiPy(api_key, versions, region) 
 ##api_instance = RiotApiPy() 
@@ -54,6 +57,22 @@ example_match = mygamedata.raw_games[0]
 # Get summoner IDs of other players in example match 
 mygamedata.get_summoner_ids(example_match)
 
+# Get champion static data
+champdata = api_instance.static_get_champion_list()
+staticdata = GrabStaticData(champdata)
+
+# Get ranked data *for a single player* and sort
+player_ranked_data = GrabRankedData(api_instance.get_ranked_stats_by_summoner_id(playerid, 4))
+
+# Get stats for a single champ
+##champ_stats = {}
+##relevant_stats = {}
+##champ_stats['Corki'] = player_ranked_data.get_stats_by_champid(staticdata.get_champid('Corki'))
+##for i in player_ranked_data.relevant_stat_names:
+##	if champ_stats['Corki'].has_key(i):
+##		relevant_stats[i] = champ_stats['Corki'][i]
+player_ranked_data.make_relevant(player_ranked_data.get_stats_by_champid(staticdata.get_champid('Corki')))
+final_stats = player_ranked_data.get_averages(player_ranked_data.relevant_stats)
 
 ### # Eventually: # 1. For all games, # 2. get all summoners, # 3. find 
 ### relevant match, # 4. get data # Sample:
@@ -99,7 +118,7 @@ mygamedata.get_summoner_ids(example_match)
 ##            find the same game
 ##            append the game
 ##    write the data to db (basically, in groups of 10)            
-        
+'''        
 # Bigger test (without the db check for redundant game_ids)
 db_name = "LoLStatsApp"
 db = MySQLdb.connect("127.0.0.1","root","","") 
@@ -129,7 +148,7 @@ for game_num, game in enumerate(mygamedata.all_game_ids):
 
 db.commit()
     
-                     
+   '''                  
                      
 
 

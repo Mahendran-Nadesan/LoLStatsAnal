@@ -6,4 +6,17 @@ Created: 12/03/2014
 
 The app has 2 main components:
 - A GUI which displays stats
-- A real-time stats collector (using Riot's API)
+- A non-real-time game stats collector (using Riot's API)
+
+LoLTeamChecker
+
+Created: 30/07/2014
+
+A smaller app used as practice and to get some of the features of the above app
+right.
+
+The app has 2 main components:
+- A GUI which displays stats and predictions about your current team (summoners
+and champions must be manually entered). Includes averages, sums (like your
+team's total kda, total %win)
+- Components which get ranked stats for champs (per summoner)
