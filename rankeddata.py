@@ -47,6 +47,7 @@ class GrabRankedData:
         for stat in champ_stats:
             ave_stats[stat] = round(champ_stats[stat]/num_games, 2)
         champ_stats['totalSessionsPlayed'] = num_games
+        ave_stats['totalSessionsPlayed'] = num_games
         return ave_stats
 
     def get_stats_by_champid(self, champid):

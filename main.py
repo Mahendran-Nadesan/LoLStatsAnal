@@ -8,6 +8,7 @@ from gamedata import grabgamedata
 from staticdata import GrabStaticData
 from dbconnection import aux_db
 from rankeddata import GrabRankedData
+from LoLTeamCheckerGUI import LoLTeamChecker
 import MySQLdb
 import collections 
 
@@ -157,3 +158,6 @@ db.commit()
 ##	for j, l in enumerate(all_stats[i]):
 ##		print all_stats[i].keys()[j], ": ", all_stats[i][l]
 ##        print
+
+mygui = LoLTeamChecker()
+mygui.mainloop()
