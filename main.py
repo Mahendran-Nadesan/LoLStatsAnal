@@ -8,7 +8,7 @@ from gamedata import grabgamedata
 from staticdata import GrabStaticData
 from dbconnection import aux_db
 from rankeddata import GrabRankedData
-from LoLTeamCheckerGUI import LoLTeamChecker
+##from LoLTeamCheckerGUI import LoLTeamChecker
 import MySQLdb
 import collections 
 
@@ -34,36 +34,37 @@ api_instance = RiotApiPy(api_key, versions, region)
 # class and get called by the GUI 
 
 
-summoner_name = "nadsofmahen" 
-summoner = api_instance.get_summoners_by_name(summoner_name, "euw") 
-playerid = str(summoner['nadsofmahen']['id']) 
+##summoner_name = "mindfreakz" 
+##summoner = api_instance.get_summoners_by_name(summoner_name, "euw") 
+##playerid = str(summoner['mindfreakz']['id'])
+##playerid = str(summoner[summoner_name.lower()]['id'])
 ##print summoner ##summoner = 
-api_instance.get_summoners_by_id(playerid, "euw") 
+##api_instance.get_summoners_by_id(playerid, "euw") 
 ##print summoner 
 
 # Get last 10 games
-games = api_instance.get_games_by_summoner_id(playerid, "euw")
-newgames = api_instance.get_games_by_name(summoner_name) 
+##games = api_instance.get_games_by_summoner_id(playerid, "euw")
+##newgames = api_instance.get_games_by_name(summoner_name) 
 
 # Make instance of gamedata class
-mygamedata = grabgamedata(newgames) 
+##mygamedata = grabgamedata(newgames) 
 
 # Get IDs of 10 games - unsorted, most recent first 
-mygamedata.get_game_ids() 
+##mygamedata.get_game_ids() 
 ##print mygamedata.all_game_ids 
 
 # This will be looped eventually...
-example_match = mygamedata.raw_games[0] 
+##example_match = mygamedata.raw_games[0] 
 
 # Get summoner IDs of other players in example match 
-mygamedata.get_summoner_ids(example_match)
+##mygamedata.get_summoner_ids(example_match)
 
 # Get champion static data
 champdata = api_instance.static_get_champion_list()
 staticdata = GrabStaticData(champdata)
 
 # Get ranked data *for a single player* and sort
-player_ranked_data = GrabRankedData(api_instance.get_ranked_stats_by_summoner_id(playerid, 4))
+##player_ranked_data = GrabRankedData(api_instance.get_ranked_stats_by_summoner_id(playerid, 4))
 
 # Get stats for a single champ
 ##champ_stats = {}
@@ -72,8 +73,8 @@ player_ranked_data = GrabRankedData(api_instance.get_ranked_stats_by_summoner_id
 ##for i in player_ranked_data.relevant_stat_names:
 ##	if champ_stats['Corki'].has_key(i):
 ##		relevant_stats[i] = champ_stats['Corki'][i]
-player_ranked_data.make_relevant(player_ranked_data.get_stats_by_champid(staticdata.get_champid('Corki')))
-final_stats = player_ranked_data.get_averages(player_ranked_data.relevant_stats)
+##player_ranked_data.make_relevant(player_ranked_data.get_stats_by_champid(staticdata.get_champid('Zed')))
+##final_stats = player_ranked_data.get_averages(player_ranked_data.relevant_stats)
 
 ### # Eventually: # 1. For all games, # 2. get all summoners, # 3. find 
 ### relevant match, # 4. get data # Sample:
@@ -159,5 +160,40 @@ db.commit()
 ##		print all_stats[i].keys()[j], ": ", all_stats[i][l]
 ##        print
 
-mygui = LoLTeamChecker()
-mygui.mainloop()
+##mygui = LoLTeamChecker()
+##mygui.mainloop()
+
+summoner_names = ["saderlack"]
+champs = ["Nautilus"]
+my_team = []
+for i, j in enumerate(summoner_names):
+    summoner = api_instance.get_summoners_by_name(j, "euw") 
+    playerid = str(summoner[(j.replace(" ","")).lower()]['id'])
+    player_ranked_data = GrabRankedData(api_instance.get_ranked_stats_by_summoner_id(playerid, 4))
+    player_ranked_data.make_relevant(player_ranked_data.get_stats_by_champid(staticdata.get_champid(champs[i])))
+    final_stats = player_ranked_data.get_averages(player_ranked_data.relevant_stats)
+    for k, l in enumerate(final_stats):
+        print k, final_stats.keys()[k], final_stats.values()[k]
+    kda = round((final_stats['totalChampionKills'] + final_stats['totalAssists'])/final_stats['totalDeathsPerSession'], 2)
+    print "kda: ", kda
+    my_team.append(final_stats)
+    print "{k} / {d} / {a}".format(k=final_stats['totalChampionKills'], d=final_stats['totalDeathsPerSession'], a=final_stats['totalAssists'])
+    print
+
+##summoner_names = ["boobsftw", "I am excite", "Suphakejcie"]#, "NadsOfMahen", "v TSM"]
+##champs = ["Kha'Zix", "Master Yi", "Nidalee"]#, "Corki", "Taric"]
+##enemy_team = []
+##
+##for i, j in enumerate(summoner_names):
+##    summoner = api_instance.get_summoners_by_name(j, "euw") 
+##    playerid = str(summoner[(j.replace(" ","")).lower()]['id'])
+##    player_ranked_data = GrabRankedData(api_instance.get_ranked_stats_by_summoner_id(playerid, 4))
+##    player_ranked_data.make_relevant(player_ranked_data.get_stats_by_champid(staticdata.get_champid(champs[i])))
+##    final_stats = player_ranked_data.get_averages(player_ranked_data.relevant_stats)
+##    for k, l in enumerate(final_stats):
+##        print k, final_stats.keys()[k], final_stats.values()[k]
+##    kda = round((final_stats['totalChampionKills'] + final_stats['totalAssists'])/final_stats['totalDeathsPerSession'], 2)
+##    print "kda: ", kda
+##    enemy_team.append(final_stats)
+##    print
+##

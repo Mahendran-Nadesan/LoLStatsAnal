@@ -1,10 +1,6 @@
-"""The GUI for LoLTeamChecker
+# script to check LoLTeamCheckerGUI
 
-The GUI has rows for each champ, allowing for entry of summoner name
-and champion. When appropriate buttons are pressed, average/relevant
-data is returned."""
+from LoLTeamCheckerGUI import LoLTeamChecker
+mygui = LoLTeamChecker()
+mygui.mainloop()
 
-import Tkinter as tk
-import tkFileDialog
-
-class LoLTeamChecker(

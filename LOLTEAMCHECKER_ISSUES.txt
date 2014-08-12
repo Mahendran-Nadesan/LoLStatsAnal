@@ -41,3 +41,10 @@ form - i.e.:
 
 and, 
 (2) make sure the entry from the GUI gets converted before being checked.
+
+
+
+
+Misc.:
+
+1. Create all frames [x]
