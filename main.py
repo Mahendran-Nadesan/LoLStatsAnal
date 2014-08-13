@@ -163,8 +163,13 @@ db.commit()
 ##mygui = LoLTeamChecker()
 ##mygui.mainloop()
 
+<<<<<<< HEAD
 summoner_names = ["agsd00m"]
 champs = ["Nidalee"]
+=======
+summoner_names = ["saderlack"]
+champs = ["Nautilus"]
+>>>>>>> origin/master
 my_team = []
 for i, j in enumerate(summoner_names):
     summoner = api_instance.get_summoners_by_name(j, "euw") 
