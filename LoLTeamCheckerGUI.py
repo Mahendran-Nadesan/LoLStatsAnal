@@ -15,78 +15,147 @@ class LoLTeamChecker(tk.Frame):
         self.frames = []
         self.labels = []
         self.entries = []
-        self.entry_values = []
+        self.user_values = {}
         self.row_buttons = []
-        self.default_values = {}
+        # Please check how to code this by PEP standards
+        self.default_values = {'ln': ["Summoner Name", "Champion Name"],
+                               'rn': ["Total Games", "Win Rate", "Ave "
+                                      "Kills", "Ave Deaths", "Ave "
+                                      "Assists", "Ave CS", "Ave Towers",
+                                      "KDA", "Prediction"],
+                               'li': {"Names":['{s}'.format(s="Summoner"
+                                                            " ") + str(i)
+                                               for i in range(1, 6)],
+                                      "Champs": ['{s}'.format(s="Champ ")
+                                                 + str(i) for i in
+                                                 range(1,6)]},
+                               'ri':['-' if i==8 else '0' for i in
+                                     range(9) for j in range(5)]}
         self.header_values = []
+##        self.pack(side="top", expand=False, fill="x")
 
-        self._create_headers(0)
-##        self.frames[0].pack(side="top", pady=5)
+        # Create various frames
+##        self._create_headers(0)
+##        for i in range(1, 6):
+##            self._create_summoner_row(i)
+        self._create_left_name_frame(self.default_values['ln'])
+##        self._create_mid
+        self._create_right_name_frame(self.default_values['rn'])
+        self._create_left_info_frame(self.default_values['ln'])
+        self._create_button_frame()
+        self._create_right_info_frame(self.default_values['rn'])
 
-        for i in range(1, 6):
-            
-            self._create_summoner_row(i)
-##            self.frames[i].pack(side="top", pady=5)
-
-        print self.frames
-
-##        self._create_summary()
-
-
-    def _create_headers(self, row):
-        """Creates the headings for the stats."""
-        # Add the frame
-        self.frames.append(tk.Frame(self.master))
-        self.frames[row].pack(side="top", pady=5)
+##        self.master.grid()
+        top = self.winfo_toplevel()
+##        top.grid(0, "ew")
+        top.columnconfigure(0, weight=1, minsize=100)
+        top.columnconfigure(1, weight=1, minsize=50)
+        top.columnconfigure(2, weight=2, minsize=100)
+##        top.rowconfigure(0, weight=1)
+        top.rowconfigure(1, weight=1)
+##        self.columnconfigure(0, weight=1)
+##        self.columnconfigure(1, weight=1)
+##        self.rowconfigure(0, weight=0)
+        self.grid(sticky="ew")
+##        self.master.title("jkshd")
         
-        # Add the label list
-        self.labels.append([])
-
-        self.default_values['Headers'] = ["Summoner Name", "Champion \
-        Name", "Total Games", "Win Rate", "Ave Kills", "Ave Deaths",
-        "Ave Assists", "Ave CS", "Ave Towers", "KDA", "Prediction"]
-        
-        for i, heading in enumerate(self.default_values['Headers']):
-            self.labels[row].append(tk.Label(self.frames[row], width=10, text=heading))
-            self.labels[row][i].pack(side="left", padx=5)
-            print heading
-
-        self.labels
-        
-        return self.frames[row]
-            
 
     def _create_summary(self):
         pass
 
         
-    def _create_summoner_row(self, row):
-        """Creates a summoner row with the following types/attributes:
-        Entries: summoner_name, champ_name
-        Dynamic Labels: num_games, win_rate, ave_kills, ave_deaths,
-        ave_assists, ave_kda, ave_cs, ave_turrets, ave_gold"""
-        self.frames.append(tk.Frame(self.master))
-        self.frames[row].pack(side="top", pady=5)
+    def _create_left_name_frame(self, headers):
+        """Creates a left, top, frame, for the headers."""
+        self.frames.append(tk.LabelFrame(self.master, bg="red"))
+        self.labels.append([])
+        
+        for i, name in enumerate(headers):
+            self.labels[0].append(tk.Label(self.frames[0], text=name,
+                                           relief="groove"))
+            self.labels[0][i].grid(column=i, row=0, sticky="ew")
+            self.frames[0].columnconfigure(i, weight=1, minsize=100)
 
-        self.default_values['Entries'] = ["Summoner ", "Champion"]
+        # For .grid one must modify their positions by referencing
+        # their parents. Here: the LabelFrame is self.frames[0], and
+        # in order to modify the positions, etc. of the Labels *IN*
+        # the LabelFrame, one must modify the relevant coordinates in
+        # the LabelFrame, not by referencing the Labels:
+        # x = Label(parent, ...) {parent=LabelFrame}
+        # x.grid(column_in_parent, row_in_parent)
+        
+        # For .columnconfigure one must modify the column within its
+        # parent widget, not by referencing its parents. Here, the
+
+        self.frames[0].grid(column=0, row=0, sticky="ew", columnspan=1)
+        
+    def _create_right_name_frame(self, headers):
+        self.frames.append(tk.LabelFrame(self.master, bg="blue"))
+        self.labels.append([])
+
+        for i, name in enumerate(headers):
+            self.labels[1].append(tk.Label(self.frames[1], text=name,
+                                           relief="sunken"))
+            self.labels[1][i].grid(column=i, row=0, sticky="ew")
+            self.frames[1].columnconfigure(i, weight=1)
+
+        self.frames[1].grid(column=2, row=0, sticky="ew")
+            
+    def _create_left_info_frame(self, headers):
+        self.frames.append(tk.Frame(self.master, bg="green"))
         self.entries.append([])
-##        self.labels.append([])
-        self.entry_values.append([])
-        print self.entry_values
-        
-        for entry in range(2):
-            print row
-            self.entry_values[row-1].append(tk.StringVar)
-            self.entries[row-1].append(tk.Entry(self.frames[row], textvariable=self.entry_values[row-1][entry]))
-            self.entry_values[row-1][entry] = str(self.default_values['Entries'][entry]) + str(row)
-            self.entries[row-1][entry].pack(side="left", padx=5)
 
-        print self.frames
-        return self.frames[row]
+        for column, name in enumerate(headers):
+            self.frames[2].columnconfigure(column, weight=1)
+            self.user_values[name] = []
+            for row in range(5):
+                self.user_values[name].append(tk.StringVar())
+                self.user_values[name][row].set(self.default_values
+                                                ['li']
+                                                [self.default_values
+                                                 ['li'].keys()[column]]
+                                                [row])
+                self.entries[0].append(tk.Entry(self.frames[2],
+                                                textvariable=self.
+                                                user_values[name][row]))
+                self.entries[0][(column*5)+row].grid(column=column,
+                                                     row=row, sticky="ew")
+                self.frames[2].rowconfigure(row, weight=1, minsize=50)
+                
 
+        self.frames[2].grid(column=0, row=1, sticky="ew")
+
+    def _create_button_frame(self):
+        self.frames.append(tk.Frame(self.master, bg="yellow"))
+        self.row_buttons.append([])
+
+        for row in range(5):
+            self.row_buttons[0].append(tk.Button(self.frames[3],
+                                                 text="Go!", command=
+                                                 lambda x=row: self.
+                                                 _test_get(x)))
+            self.row_buttons[0][row].grid(column=0, row=row)
+            self.frames[3].rowconfigure(row, weight=1, minsize=50)
         
+        self.frames[3].grid(column=1, row=1, sticky="ew")
+        self.frames[3].columnconfigure(0, weight=1, minsize=50)
+                           
+    def _create_right_info_frame(self, headers):
+        self.frames.append(tk.Frame(self.master, bg="blue"))
+        self.labels.append([])
+
+        for column, name in enumerate(headers):
+            self.frames[4].columnconfigure(column, weight=1)
+            for row in range(5):
+                self.labels[2].append(tk.Label(self.frames[4], text=
+                                               (self.default_values
+                                                ['ri'][(column*5)+row]), relief="ridge"))
+                self.labels[2][(column*5)+row].grid(column=column, row=row, sticky="ew")
+                self.frames[4].rowconfigure(row, weight=1, minsize=50)
+        self.frames[4].grid(column=2, row=1, sticky="ew")
+
+    def _test_get(self, row):
+        print self.entries[0][row].get()
         
-    
     
                              
             
