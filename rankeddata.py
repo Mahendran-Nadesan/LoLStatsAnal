@@ -43,12 +43,13 @@ class GrabRankedData:
         # num_games, then add it back to the dict because it might be
         # used.
         num_games = champ_stats.pop('totalSessionsPlayed')
-        ave_stats = {}
+        self.champ_stats = champ_stats
+        self.ave_stats = {}
         for stat in champ_stats:
-            ave_stats[stat] = round(champ_stats[stat]/num_games, 2)
+            self.ave_stats[stat] = round(champ_stats[stat]/num_games, 2)
         champ_stats['totalSessionsPlayed'] = num_games
-        ave_stats['totalSessionsPlayed'] = num_games
-        return ave_stats
+        self.ave_stats['totalSessionsPlayed'] = num_games
+        return self.ave_stats
 
     def get_stats_by_champid(self, champid):
         """Gets ranked stats by champid."""
@@ -62,6 +63,25 @@ class GrabRankedData:
         for name in self.relevant_stat_names:
             if champ_all_stats.has_key(name):
                 self.relevant_stats[name] = champ_all_stats[name]
+
+    def convert(self):
+        """Convert to final form."""
+        # Sort this mess:
+        # 1. Any way to automate this?
+        # 2. Turns out %win is rounded too early (i.e. in
+        # self.get_averages)
+        self.converted_stats = {}
+        self.converted_stats["Total Games"] = self.ave_stats['totalSessionsPlayed']
+        self.converted_stats["Win Rate"] = round(((self.champ_stats['totalSessionsWon']/self.champ_stats['totalSessionsPlayed'])*100), 2)
+        self.converted_stats["Ave Kills"] = self.ave_stats['totalChampionKills']
+        self.converted_stats["Ave Deaths"] = self.ave_stats['totalDeathsPerSession']
+        self.converted_stats["Ave Assists"] = self.ave_stats['totalAssists']
+        self.converted_stats["Ave CS"] = self.ave_stats['totalMinionKills']
+        self.converted_stats["Ave Towers"] = self.ave_stats['totalTurretsKilled']
+        self.converted_stats["Ave Gold"] = self.ave_stats['totalGoldEarned']
+        self.converted_stats["KDA"] = round((self.ave_stats['totalChampionKills'] + self.ave_stats['totalAssists'])/self.ave_stats['totalDeathsPerSession'], 2)
+        return self.converted_stats
+                                    
 ##        return 
 
 

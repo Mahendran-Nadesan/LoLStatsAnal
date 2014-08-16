@@ -33,6 +33,20 @@ GrabStaticData.get_champid(name) for each champ
 then use GrabRankedData.get_stats_by_name("Jarvan IV")
 
 ===============================================================================
+Major Stuff:
+-------------------
+1. Make the model. Currently all important info is being played with inside the
+controller.
+
+2. Find a better way to do the imports (redundant imports), and *maybe* 
+refactor so that the controller calls the GUI in main.py, not the other way 
+around.
+
+3. Find a better way to convert Riot's JSON names to my headers.
+
+4. Sort out the StringVar()/IntVar() issue. Currently all variables are 
+StringVar(), but that will be problematic for adding, etc.
+===============================================================================
 Small QOL Stuff:
 -------------------
 1. Make sure champion names can be entered into the GUI in a case insensitive
@@ -42,7 +56,11 @@ form - i.e.:
 and, 
 (2) make sure the entry from the GUI gets converted before being checked.
 
+2. Write checks for region (currently LoLTeamCheckerController has "euw" 
+hardcoded for its self.api_instance...)
 
+3. Make right, middle, label frames uniform in size (currently don't correspond
+to label head sizes).
 
 
 Misc.:

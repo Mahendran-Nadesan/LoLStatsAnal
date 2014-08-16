@@ -6,45 +6,50 @@ data is returned."""
 
 import Tkinter as tk
 import tkFileDialog
+from LoLTeamCheckerController import LoLTeamCheckerController
 
-class LoLTeamChecker(tk.Frame):
+class LoLTeamCheckerGUI(tk.Frame):
     """Main GUI frame, which loads individual frames."""
-    def __init__(self, master=None):
-        """Initialises class, runs the method for loading in frames."""
+    def __init__(self, api_instance, master=None):
+        """Initialises class, runs the methods for loading in
+        frames."""
+
+        # Initialise variables
         tk.Frame.__init__(self)
+        # This line is sooo important: self, not self.master!
+        self.controller = LoLTeamCheckerController(self, api_instance)    
         self.frames = []
         self.labels = []
         self.entries = []
         self.user_values = {}
+        self.header_values = {}
         self.row_buttons = []
+
         # Please check how to code this by PEP standards
         self.default_values = {'ln': ["Summoner Name", "Champion Name"],
                                'rn': ["Total Games", "Win Rate", "Ave "
                                       "Kills", "Ave Deaths", "Ave "
                                       "Assists", "Ave CS", "Ave Towers",
-                                      "KDA", "Prediction"],
+                                      "Ave Gold", "KDA", "Prediction"],
                                'li': {"Names":['{s}'.format(s="Summoner"
                                                             " ") + str(i)
                                                for i in range(1, 6)],
                                       "Champs": ['{s}'.format(s="Champ ")
                                                  + str(i) for i in
                                                  range(1,6)]},
-                               'ri':['-' if i==8 else '0' for i in
-                                     range(9) for j in range(5)]}
-        self.header_values = []
-##        self.pack(side="top", expand=False, fill="x")
+                               'ri':['-' if i==9 else '0' for i in
+                                     range(10) for j in range(5)]}
 
-        # Create various frames
-##        self._create_headers(0)
-##        for i in range(1, 6):
-##            self._create_summoner_row(i)
+        # Create Frames
         self._create_left_name_frame(self.default_values['ln'])
-##        self._create_mid
+##        self._create_mid # mid, top, frame created by column
+##        configuration, not explicitly.
         self._create_right_name_frame(self.default_values['rn'])
         self._create_left_info_frame(self.default_values['ln'])
         self._create_button_frame()
         self._create_right_info_frame(self.default_values['rn'])
 
+        # Configure frames  
 ##        self.master.grid()
         top = self.winfo_toplevel()
 ##        top.grid(0, "ew")
@@ -65,7 +70,8 @@ class LoLTeamChecker(tk.Frame):
 
         
     def _create_left_name_frame(self, headers):
-        """Creates a left, top, frame, for the headers."""
+        """Creates a left, top, frame, for the name headers."""
+        
         self.frames.append(tk.LabelFrame(self.master, bg="red"))
         self.labels.append([])
         
@@ -89,6 +95,8 @@ class LoLTeamChecker(tk.Frame):
         self.frames[0].grid(column=0, row=0, sticky="ew", columnspan=1)
         
     def _create_right_name_frame(self, headers):
+        """Creates a right, top, frame for the data headers."""
+
         self.frames.append(tk.LabelFrame(self.master, bg="blue"))
         self.labels.append([])
 
@@ -101,6 +109,9 @@ class LoLTeamChecker(tk.Frame):
         self.frames[1].grid(column=2, row=0, sticky="ew")
             
     def _create_left_info_frame(self, headers):
+        """Creates a left, middle, frame, with 5 entry widgets, which
+        the user will fill."""
+        
         self.frames.append(tk.Frame(self.master, bg="green"))
         self.entries.append([])
 
@@ -125,14 +136,16 @@ class LoLTeamChecker(tk.Frame):
         self.frames[2].grid(column=0, row=1, sticky="ew")
 
     def _create_button_frame(self):
+        """Creates a middle, middle, frame, with a "Go!" button."""
+        
         self.frames.append(tk.Frame(self.master, bg="yellow"))
         self.row_buttons.append([])
 
         for row in range(5):
             self.row_buttons[0].append(tk.Button(self.frames[3],
-                                                 text="Go!", command=
-                                                 lambda x=row: self.
-                                                 _test_get(x)))
+                                                 text="Go!",
+                                                 command=lambda
+                                                 x=row:self._pass_li(x)))
             self.row_buttons[0][row].grid(column=0, row=row)
             self.frames[3].rowconfigure(row, weight=1, minsize=50)
         
@@ -140,21 +153,38 @@ class LoLTeamChecker(tk.Frame):
         self.frames[3].columnconfigure(0, weight=1, minsize=50)
                            
     def _create_right_info_frame(self, headers):
+        """Creates a right, middle, frame, with "empty" labels for the
+        data."""
+
         self.frames.append(tk.Frame(self.master, bg="blue"))
         self.labels.append([])
 
         for column, name in enumerate(headers):
             self.frames[4].columnconfigure(column, weight=1)
+            self.header_values[name] = []
             for row in range(5):
-                self.labels[2].append(tk.Label(self.frames[4], text=
-                                               (self.default_values
-                                                ['ri'][(column*5)+row]), relief="ridge"))
+                self.header_values[name].append(tk.StringVar())
+                self.header_values[name][row].set(self.default_values
+                                                  ['ri'][(column*5)+row])
+##                self.labels[2].append(tk.Label(self.frames[4], text=
+##                                               (self.default_values
+##                                                ['ri'][(column*5)+row]), relief="ridge"))
+                self.labels[2].append(tk.Label(self.frames[4],
+                                               textvariable=self.
+                                               header_values[name]
+                                               [row], relief="ridge"))
                 self.labels[2][(column*5)+row].grid(column=column, row=row, sticky="ew")
                 self.frames[4].rowconfigure(row, weight=1, minsize=50)
         self.frames[4].grid(column=2, row=1, sticky="ew")
 
-    def _test_get(self, row):
-        print self.entries[0][row].get()
+    def _pass_li(self, row):
+        """Passes the info from the entry widgets to the
+        controller."""
+        
+        self.controller.set_value(self.user_values['Summoner Name']
+                                  [row].get(),
+                                  self.user_values['Champion Name']
+                                  [row].get(), row)
         
     
                              
