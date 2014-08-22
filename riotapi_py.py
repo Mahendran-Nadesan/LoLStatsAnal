@@ -43,6 +43,7 @@ class RiotApiPy:
                 self.region = region
                 self.versions = versions
                 self.limits = limits
+                self.error = []
                 self.base_url = "https://{region}.api.pvp.net/api/lol/".format(region=self.region)
                                 
 
@@ -66,8 +67,12 @@ class RiotApiPy:
                 self.r = requests.get("https://{proxy}.api.pvp.net/api/lol/{static}{region}/{req}?{secondary}api_key={key}".format(proxy="global" if static else self.region, static='static-data/'
                 if static else '', region=self.region,
                 req=str(request[0]), secondary=request[1], key=self.api_key))
-                
-                return self.r.json()
+
+                if self.r.status_code != 200:
+                        self.error = self.r.status_code
+                        return self.error
+                else:
+                        return self.r.json()
 
         def get_summoners_by_name(self, summoner_list, static=False):
                 if str(type(summoner_list)) == "<type \'list\'>":
@@ -94,6 +99,18 @@ class RiotApiPy:
                 else:
                         summonerid_list = [summonerid_list]
                 return self.send_request([self.versions['ggbid']+"/game/by-summoner/{ids}/recent".format(ids=",".join([str(i) for i in summonerid_list])), ""])
+
+        def get_match_history_by_name(self, summoner, static=False):
+                summoner = self.get_summoners_by_name(summoner)
+                summonerid = summoner[summoner.keys()[0]]['id']
+                return self.get_match_history_by_summoner_id(summonerid)
+       
+        def get_match_history_by_summoner_id(self, summonerid_list, static=False):
+                if str(type(summonerid_list))== "<type /'list\'>":
+                        pass
+                else:
+                        summonerid_list = [summonerid_list]
+                return self.send_request([self.versions['gmhbid']+"/matchhistory/{ids}".format(ids=",".join([str(i) for i in summonerid_list])), ""])
 
         def get_ranked_stats_by_summoner_id(self, summonerid, season, static=False):
                 if str(type(summonerid))== "<type /'int\'>":

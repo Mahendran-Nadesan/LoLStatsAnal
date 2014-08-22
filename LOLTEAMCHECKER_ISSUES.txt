@@ -36,16 +36,64 @@ then use GrabRankedData.get_stats_by_name("Jarvan IV")
 Major Stuff:
 -------------------
 1. Make the model. Currently all important info is being played with inside the
-controller.
+controller. DONE
 
 2. Find a better way to do the imports (redundant imports), and *maybe* 
 refactor so that the controller calls the GUI in main.py, not the other way 
-around.
+around.	DONE
 
 3. Find a better way to convert Riot's JSON names to my headers.
 
 4. Sort out the StringVar()/IntVar() issue. Currently all variables are 
 StringVar(), but that will be problematic for adding, etc.
+
+5. Currently pressing tab cycles you through each row in a column, instead of 
+vice-versa. Should be [S.Name]->[C.Name]->"Go!". Refactor code for this.
+
+6. In the controller, do I really want to be passing arguments continuously to
+the model's methods? The only alternatives I can currently think of would be
+to:
+
+(1) call each successive method in the current method:
+
+def _get_ranked_data(self, summoner_name, champ_name):
+
+	self.id = get-summoner-id
+	data = GrabRankedData(...self.id)
+	self._get_champ_stats(champ_name)
+
+def _get_champ_stats(self, summoner_name, champ_name):
+	etc.
+
+(2)	save persistent attributes, and call them in each method (i.e. arguments 
+already inside the method)
+
+controller.py:
+def _process_line(self, i):
+        [summoner_name, champ_name] = self.get_user_values(i)
+		self.model.take_these_vars(summoner_name, champ_name)
+        self.model._get_summoner_data()
+        self.model._get_ranked_data()
+        self.model._get_champ_stats()
+    
+model.py
+def 
+
+7. Deal with weird character encodings.
+
+8. Find out how people do floats as (Tk.var()). Either:
+
+(1) Write a method to convert to float, do the maths, convert back to 
+StringVar()
+
+(2) Check for native methods for floats (because IntVar rounds).
+
+SORT OF DONE - DoubleVar() doesn't work for strings.
+
+9. Write appropriate try...except methods for invalid summoner names and 
+champion names. Requires changes to riotapi_py (get error codes: 404, 503, 
+etc.), LoLTeamCheckerGUI (appropriate message boxes), and 
+LoLTeamCheckerController (maybe a _catch_error() called in _process_line()?).
 ===============================================================================
 Small QOL Stuff:
 -------------------
@@ -62,6 +110,11 @@ hardcoded for its self.api_instance...)
 3. Make right, middle, label frames uniform in size (currently don't correspond
 to label head sizes).
 
+4. Make fonts smaller, pad for size, etc.
+
+5. Automate frame indexing (i.e. don't call self.frames[explicit number]).
+
+6. Sort out option menu for regions - lock size, make a better drop-down?
 
 Misc.:
 

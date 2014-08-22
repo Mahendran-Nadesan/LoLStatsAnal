@@ -2,43 +2,63 @@
 
 Controls calls to GUI and the data model."""
 
-##from LoLTeamCheckerGUI import LoLTeamCheckerGUI
 
-from rankeddata import GrabRankedData
-from staticdata import GrabStaticData
 
 class LoLTeamCheckerController:
     """Handles calls to the model, Riot API, and the GUI."""
-    def __init__(self, gui, api_instance): #, model, 
+    def __init__(self, gui, model): #, model, 
         """Initialises stuff???"""
 ##        pass
         self.gui = gui
-##        self.model = model
-        self.api_instance = api_instance
-        self.champdata = self.api_instance.static_get_champion_list()
-        self.staticdata = GrabStaticData(self.champdata)
+        self.model = model
+        self._set_bindings()
 
 ##        self.gui = LoLTeamCheckerGUI()
-##        for button in self.gui.row_buttons[0]:
-##            button.config(command=self.set_value())
+        
 
     def binding(self):
         pass
-        
-    def set_value(self, summoner_name, champ_name, row):#, value):
-        """Sets the value in the gui"""
 
+    def _process_line(self, line):
+        """Runs all the methods for getting the data in one row of the
+        gui."""
+        [summoner_name, champ_name] = self.gui._get_user_values(line)
+        if self.model.region != self.gui._get_region_value():
+            self.model.region = self.gui._get_region_value()
+            self.model._update()
+        # This section needs to be rethought out and rewritten - i.e.
+        # it has to catch the error code (from riotapy), send it here,
+        # so it can be sent to the gui, to generate an appropriate
+        # message box.
+##        try:
+        self.model._get_champ_stats(summoner_name, champ_name)
+##        except:
+##            self._error()
+        
+        self.gui._set_right_info_row_values(line, self.model.final_stats[summoner_name])
+
+    def _set_bindings(self):
+        """Set bindings for buttons in GUI."""
+        for i, button in enumerate(self.gui.row_buttons[0]):
+            button.config(command=lambda row=i: self._process_line(row))
+        
+
+        
+##    def get_user_values(self, row):#, value):
+##        """Gets the summoner and champ value from the gui"""
+##        # Do a check
+       
+        
         # Make these 2 into 1 step later.
-        summoner = self.api_instance.get_summoners_by_name(
-            summoner_name, "euw")
-        summoner_id = str(summoner[(summoner_name.replace(" ", "")).lower()]['id'])
+
+        
         # Some of this must go into the model later.
-        player_ranked_data = GrabRankedData(self.api_instance.get_ranked_stats_by_summoner_id(summoner_id, 4))
-        player_ranked_data.make_relevant(player_ranked_data.get_stats_by_champid(self.staticdata.get_champid(champ_name)))
-        relevant_stats = player_ranked_data.get_averages(player_ranked_data.relevant_stats)
-        self.final_stats = player_ranked_data.convert()
-        for i in self.final_stats.keys():
-            self.gui.header_values[i][row].set(str(self.final_stats[i]))
+
+##        
+##        relevant_stats = player_ranked_data.get_averages(player_ranked_data.relevant_stats)
+##        self.final_stats = player_ranked_data.convert()
+##        for i in self.final_stats.keys():
+##            self.gui.header_values[i][row].set(str(self.final_stats[i]))
         
         
 ##        print var1, var2
