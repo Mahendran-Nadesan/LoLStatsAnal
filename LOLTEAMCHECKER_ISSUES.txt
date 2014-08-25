@@ -45,7 +45,7 @@ around.	DONE
 3. Find a better way to convert Riot's JSON names to my headers.
 
 4. Sort out the StringVar()/IntVar() issue. Currently all variables are 
-StringVar(), but that will be problematic for adding, etc.
+StringVar(), but that will be problematic for adding, etc. DONE (see 8.?)
 
 5. Currently pressing tab cycles you through each row in a column, instead of 
 vice-versa. Should be [S.Name]->[C.Name]->"Go!". Refactor code for this.
@@ -94,6 +94,10 @@ SORT OF DONE - DoubleVar() doesn't work for strings.
 champion names. Requires changes to riotapi_py (get error codes: 404, 503, 
 etc.), LoLTeamCheckerGUI (appropriate message boxes), and 
 LoLTeamCheckerController (maybe a _catch_error() called in _process_line()?).
+
+More importantly, make sure things are handled in the appropriate places.
+(1) riotapi must return a riotapiexception. DONE
+(2) the MODEL must check for thrown/raised exceptions. DONE
 ===============================================================================
 Small QOL Stuff:
 -------------------

@@ -30,6 +30,19 @@ class RateLimit:
         def can_request(self):
             self.__reload()
             return len(self.made_requests) < self.allowed_requests
+
+class RiotApiPyException(Exception):
+        def __init__(self, error):
+                self.error_codes = {400: "Bad Request", 401:
+                                    "Unauthorised", 404:
+                                    "Not Found", 429: "Too many"
+                                    " Requests", 500: "Internal"
+                                    " Service Error", 503: "Service"
+                                    " Unavailable"}
+                self.error = self.error_codes[error]
+                
+        def __str__(self):
+                return self.error
                      
 
 class RiotApiPy:
@@ -64,15 +77,33 @@ class RiotApiPy:
                 if self.region is None:
                         self.region = self.default_region
                 print self.region
-                self.r = requests.get("https://{proxy}.api.pvp.net/api/lol/{static}{region}/{req}?{secondary}api_key={key}".format(proxy="global" if static else self.region, static='static-data/'
-                if static else '', region=self.region,
-                req=str(request[0]), secondary=request[1], key=self.api_key))
 
-                if self.r.status_code != 200:
-                        self.error = self.r.status_code
-                        return self.error
-                else:
+                try:
+                        self.r = requests.get("https://{proxy}.api."
+                                              "pvp.net/api/lol/"
+                                              "{static}{region}/"
+                                              "{req}?{secondary}"
+                                              "api_key={key}".format
+                                              (proxy="global"
+                                              if static else
+                                              self.region,
+                                              static='static-data/'
+                                              if static else
+                                              '',region=self.region,
+                                              req=str(request[0]),
+                                              secondary=request[1],
+                                              key=self.api_key))
+
                         return self.r.json()
+                except:
+                        self.error = RiotApiPyException(self.r.status_code)
+                        raise self.error
+##
+##                if self.r.status_code != 200:
+##                        self.error = self.r.status_code
+##                        return self.error
+##                else:
+##                        return self.r.json()
 
         def get_summoners_by_name(self, summoner_list, static=False):
                 if str(type(summoner_list)) == "<type \'list\'>":

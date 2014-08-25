@@ -4,7 +4,7 @@ Retrieves, and stores data retrieved by the API and manipulates them
 as needed. Called by the controller."""
 
 ##from LoLTeamCheckerController import LoLTeamCheckerController
-from riotapi_py import RiotApiPy
+from riotapi_py import *
 from rankeddata import GrabRankedData
 from staticdata import GrabStaticData
 
@@ -12,7 +12,6 @@ from staticdata import GrabStaticData
 
 class LoLTeamCheckerModel:
     def __init__(self, region="euw"):
-##        self.controller = controller
         self.data = {}
         self.summoners = {}
         self.final_stats = {}
@@ -34,20 +33,37 @@ class LoLTeamCheckerModel:
         self.summoners[self.summoner_name] = self.api_instance.get_summoners_by_name(self.summoner_name, self.region)
 
     def _get_ranked_data(self):
-        """Redundant method for getting all ranked data for a
-        summoner. I.e. I never use it directly - I always pick one
-        champion's data, but I might post all stats some day."""
+        """Method for getting all ranked data for a summoner, which
+        will be used to get requested champion's data."""
+        # I don't use all the stats provided, but this is the only
+        # reliable way to get individual champion stats for a
+        # summoner.
         summoner_id = str(self.summoners[self.summoner_name][(self.summoner_name.replace(" ", "")).lower()]['id'])
         self.data[self.summoner_name] = GrabRankedData(self.api_instance.get_ranked_stats_by_summoner_id(summoner_id, 4))
 
     def _get_champ_stats(self, summoner_name, champ_name):
-        """Gets the champion's stats, via other methods."""
+        """Gets the summoner's champion stats, via other methods."""
         self.summoner_name = summoner_name
         self.champ_name = champ_name
         self.final_stats[summoner_name]= {}
-        self._get_summoner_data()
+        # Check for API errors
+        try:
+            self._get_summoner_data()
+        except:
+            if self.api_instance.r.status_code == 404:    # rewrite
+                self.error = "Summoner does not exist!"
+            else:
+                self.error = self.api_instance.error.__str__()
+            pass
+        # Get ranked data if summoner name exists
         self._get_ranked_data()
-        self.data[summoner_name].make_relevant(self.data[summoner_name].get_stats_by_champid(self.staticdata.get_champid(self.champ_name)))
+        # Check for data errors
+        try:
+            self.data[summoner_name].make_relevant(self.data[summoner_name].get_stats_by_champid(self.staticdata.get_champid(self.champ_name)))
+        except:
+            self.error = "No data for champ!"
+        pass
+        # Process data if champion data exists
         self.data[summoner_name].get_averages(self.data[summoner_name].relevant_stats)
         self.final_stats[summoner_name] = self.data[summoner_name].convert()
 

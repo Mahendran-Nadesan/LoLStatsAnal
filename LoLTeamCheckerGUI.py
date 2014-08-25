@@ -200,17 +200,19 @@ class LoLTeamCheckerGUI(tk.Frame):
         """Gets the region value."""
         return self.region_option.get()
 
+    def _show_error_message(self, error_code):
+        """Method for creating error message boxes."""
+        print error_code
+        self.error_box = tk.Toplevel()
+        self.error_box.title("Error!")
+        self.error_frame = tk.Frame(self.error_box)
+        self.error_frame.grid(column=0, row=0, sticky="ew")
+        self.error_frame.columnconfigure(0, weight=1, minsize=100)
+        self.error_message = tk.Message(self.error_frame, text=error_code)
+        self.error_message.grid(column=0, row=0, sticky="ew")
 
-##    def _pass_li(self, row):
-##        """Passes the info from the entry widgets to the
-##        controller."""
-##
-####        return self.user_values['Summoner Name'][row].get(), self.user_values['Champion Name'][row].get(), row
-##        
-##        self.controller.get_user_values(self.user_values['Summoner Name']
-##                                  [row].get(),
-##                                  self.user_values['Champion Name']
-##                                  [row].get(), row)
+
+
         
     
                              

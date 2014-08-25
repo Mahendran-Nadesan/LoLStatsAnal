@@ -1,6 +1,6 @@
 # script to check LoLTeamCheckerGUI
 
-from riotapi_py import RiotApiPy
+from riotapi_py import *
 from rankeddata import GrabRankedData
 from staticdata import GrabStaticData
 from LoLTeamCheckerModel import LoLTeamCheckerModel
