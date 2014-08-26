@@ -1,3 +1,5 @@
+# -*- coding: latin-1 -*-
+
 # script to check LoLTeamCheckerGUI
 
 from riotapi_py import *

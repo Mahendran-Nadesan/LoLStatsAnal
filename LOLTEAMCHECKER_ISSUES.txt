@@ -79,7 +79,7 @@ def _process_line(self, i):
 model.py
 def 
 
-7. Deal with weird character encodings.
+7. Deal with weird character encodings. DONE (need to test)
 
 8. Find out how people do floats as (Tk.var()). Either:
 
@@ -88,7 +88,7 @@ StringVar()
 
 (2) Check for native methods for floats (because IntVar rounds).
 
-SORT OF DONE - DoubleVar() doesn't work for strings.
+SORT OF DONE - DoubleVar() doesn't work for strings - i.e. "Prediction".
 
 9. Write appropriate try...except methods for invalid summoner names and 
 champion names. Requires changes to riotapi_py (get error codes: 404, 503, 
@@ -98,6 +98,19 @@ LoLTeamCheckerController (maybe a _catch_error() called in _process_line()?).
 More importantly, make sure things are handled in the appropriate places.
 (1) riotapi must return a riotapiexception. DONE
 (2) the MODEL must check for thrown/raised exceptions. DONE
+
+10. Reduce redundant api calls - i.e. if "Go" is pressed, and the summoner
+exists, then ranked stats will be saved in the Model. No need to recall the
+api when a legitimate champion (one that the summoner has played) has stats.
+
+11. If a champ's stats are successfully called, the next unsuccessful champion
+call will not produce an error. Fix:
+(1) Make sure error message pops up.
+(2)	Reset all fields to "0".
+
+12. IMPORTANT:
+Model needs to be restructured in terms of its try...except loops - i.e. they
+should stop after an exception.
 ===============================================================================
 Small QOL Stuff:
 -------------------
@@ -109,7 +122,7 @@ and,
 (2) make sure the entry from the GUI gets converted before being checked.
 
 2. Write checks for region (currently LoLTeamCheckerController has "euw" 
-hardcoded for its self.api_instance...)
+hardcoded for its self.api_instance...) DONE
 
 3. Make right, middle, label frames uniform in size (currently don't correspond
 to label head sizes).
@@ -118,7 +131,10 @@ to label head sizes).
 
 5. Automate frame indexing (i.e. don't call self.frames[explicit number]).
 
-6. Sort out option menu for regions - lock size, make a better drop-down?
+6. Sort out option menu for regions - lock size, make a better drop-down? DONE
+
+7. Use a version of print "{y:2f}".format(y=0.13452) instead of explicit 
+rounding?
 
 Misc.:
 

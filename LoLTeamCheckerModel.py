@@ -1,3 +1,5 @@
+# -*- coding: latin-1 -*-
+
 """The model for LoLTeamChecker
 
 Retrieves, and stores data retrieved by the API and manipulates them
@@ -30,7 +32,11 @@ class LoLTeamCheckerModel:
     def _get_summoner_data(self):
         """Get the summoner ranked data from the RiotAPI."""
         self.data[self.summoner_name] = {}
-        self.summoners[self.summoner_name] = self.api_instance.get_summoners_by_name(self.summoner_name, self.region)
+        self.final_stats[self.summoner_name]= {}
+        print self.summoner_name
+        print "stuff is happening..."
+        # Is there a better way to do the encoding issue?
+        self.summoners[self.summoner_name] = self.api_instance.get_summoners_by_name(self.summoner_name.encode('utf-8'), self.region)
 
     def _get_ranked_data(self):
         """Method for getting all ranked data for a summoner, which
@@ -48,13 +54,15 @@ class LoLTeamCheckerModel:
         self.final_stats[summoner_name]= {}
         # Check for API errors
         try:
+            print "inside model try loop"
             self._get_summoner_data()
         except:
-            if self.api_instance.r.status_code == 404:    # rewrite
+            print "inside model except loop"
+            if self.api_instance.r.status_code == 404: # rewrite
                 self.error = "Summoner does not exist!"
             else:
                 self.error = self.api_instance.error.__str__()
-            pass
+        print "Anything? "
         # Get ranked data if summoner name exists
         self._get_ranked_data()
         # Check for data errors
@@ -62,10 +70,37 @@ class LoLTeamCheckerModel:
             self.data[summoner_name].make_relevant(self.data[summoner_name].get_stats_by_champid(self.staticdata.get_champid(self.champ_name)))
         except:
             self.error = "No data for champ!"
-        pass
+            self.final_stats[summoner_name] = {k: 0 for k in self.final_stats[summoner_name]}
+            
         # Process data if champion data exists
+        print "I hope this isn't called"
         self.data[summoner_name].get_averages(self.data[summoner_name].relevant_stats)
         self.final_stats[summoner_name] = self.data[summoner_name].convert()
+            
+            
+        
+##        # Check if the data exists (to reduce API calls)
+##        if summoner_name not in self.data:
+##            # Check for API errors
+##            try:
+##                self._get_summoner_data()
+##            except:
+##                if self.api_instance.r.status_code == 404:    # rewrite
+##                    self.error = "Summoner does not exist!"
+##                else:
+##                    self.error = self.api_instance.error.__str__()
+##                return
+##            # Get ranked data if summoner name exists
+##            self._get_ranked_data()
+##        # Check for data errors
+##        try:
+##            self.data[summoner_name].make_relevant(self.data[summoner_name].get_stats_by_champid(self.staticdata.get_champid(self.champ_name)))
+##        except:
+##            self.error = "No data for champ!"
+##            return
+##        # Process data if champion data exists
+##        self.data[summoner_name].get_averages(self.data[summoner_name].relevant_stats)
+##        self.final_stats[summoner_name] = self.data[summoner_name].convert()
 
     def _update(self):
         """Updates when the region is not the default."""

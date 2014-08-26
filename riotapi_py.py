@@ -1,3 +1,5 @@
+# -*- coding: latin-1 -*-
+
 """
 Riot API for Python
 Initial API wrapper for my purposes/tests Current key:
@@ -93,6 +95,7 @@ class RiotApiPy:
                                               req=str(request[0]),
                                               secondary=request[1],
                                               key=self.api_key))
+                        print self.r.url
 
                         return self.r.json()
                 except:

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Temporary main file # # Call the RiotApiPy # Sort it into a main 
 # var/dict # Call/Write to database # Call GUI 
 
@@ -34,12 +35,14 @@ api_instance = RiotApiPy(api_key, versions, region)
 # class and get called by the GUI 
 
 
-summoner_name = "notarealname" 
+summoner_name = "Johnsên" 
 summoner = api_instance.get_summoners_by_name(summoner_name, "euw") 
 ##playerid = str(summoner['mindfreakz']['id'])
 ##playerid = str(summoner[summoner_name.lower()]['id'])
 ##print summoner ##summoner = 
-##api_instance.get_summoners_by_id(playerid, "euw") 
+##summoner = api_instance.get_summoners_by_id(str(32458976), "euw")
+##mystr = summoner['32458976']['name']
+##mystr.decode("UTF-8", 'replace')
 ##print summoner 
 
 # Get last 10 games

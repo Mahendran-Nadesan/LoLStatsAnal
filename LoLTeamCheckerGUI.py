@@ -1,3 +1,5 @@
+# -*- coding: latin-1 -*-
+
 """The GUI for LoLTeamChecker
 
 The GUI has rows for each champ, allowing for entry of summoner name
