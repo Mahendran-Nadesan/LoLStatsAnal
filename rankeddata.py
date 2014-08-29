@@ -21,6 +21,11 @@ class GrabRankedData:
                                     'totalMinionKills',
                                     'totalAssists',
                                     'totalTurretsKilled']
+        self.converted_stats_names = ['Total Games', 'Win Rate',
+                                      'Ave Kills', 'Ave Deaths',
+                                      'Ave Assists', 'Ave CS',
+                                      'Ave Towers', 'Ave Gold',
+                                      'KDA']
         self._sort_by_champid()
 
     def _sort_by_champid(self):

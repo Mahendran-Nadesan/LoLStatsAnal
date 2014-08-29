@@ -111,6 +111,8 @@ call will not produce an error. Fix:
 12. IMPORTANT:
 Model needs to be restructured in terms of its try...except loops - i.e. they
 should stop after an exception.
+
+13. Need a test suite for all possible conditions.
 ===============================================================================
 Small QOL Stuff:
 -------------------

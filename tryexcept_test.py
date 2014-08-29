@@ -28,8 +28,18 @@
 
 a = 2
 try:
+    print "stuff"
+    print a
     x = a
+    print x
+    x = None
     b = c
+    x = a
+    print x
 except:
-    print x, a
+
     print "no c"
+    print "more no c"
+
+
+print "This is a: ", a
