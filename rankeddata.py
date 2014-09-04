@@ -21,10 +21,10 @@ class GrabRankedData:
                                     'totalMinionKills',
                                     'totalAssists',
                                     'totalTurretsKilled']
-        self.converted_stats_names = ['Total Games', 'Win Rate',
-                                      'Ave Kills', 'Ave Deaths',
-                                      'Ave Assists', 'Ave CS',
-                                      'Ave Towers', 'Ave Gold',
+        self.converted_stats_names = ['Games', 'Win Rate', 'Kills',
+                                      'Deaths',
+                                      'Assists', 'CS',
+                                      'Towers', 'Gold',
                                       'KDA']
         self._sort_by_champid()
 
@@ -71,25 +71,35 @@ class GrabRankedData:
 
     def convert(self):
         """Convert to final form."""
-        # Sort this mess:
-        # 1. Any way to automate this?
-        # 2. Turns out %win is rounded too early (i.e. in
-        # self.get_averages)
+        # Sort this mess: 1. Any way to automate this? 2. Turns out
+        # %win is rounded too early (i.e. in self.get_averages) 3.
+        # Right now using shortened keys, for the sake of
+        # LoLTeamChecker. Just a hack, needs to be changed. The
+        # problem temporarily solved is that final_stats was assigned
+        # this whole dict, the keys of which are checked against
+        # header values, which were shorted for the GUI. Don't forget
+        # to also change self.converted_stats_names
         self.converted_stats = {}
-        self.converted_stats["Total Games"] = self.ave_stats['totalSessionsPlayed']
+        self.converted_stats["Games"] = self.ave_stats['totalSessionsPlayed']
         self.converted_stats["Win Rate"] = round(((self.champ_stats['totalSessionsWon']/self.champ_stats['totalSessionsPlayed'])*100), 2)
-        self.converted_stats["Ave Kills"] = self.ave_stats['totalChampionKills']
-        self.converted_stats["Ave Deaths"] = self.ave_stats['totalDeathsPerSession']
-        self.converted_stats["Ave Assists"] = self.ave_stats['totalAssists']
-        self.converted_stats["Ave CS"] = self.ave_stats['totalMinionKills']
-        self.converted_stats["Ave Towers"] = self.ave_stats['totalTurretsKilled']
-        self.converted_stats["Ave Gold"] = self.ave_stats['totalGoldEarned']
-        self.converted_stats["KDA"] = round((self.ave_stats['totalChampionKills'] + self.ave_stats['totalAssists'])/self.ave_stats['totalDeathsPerSession'], 2)
+        self.converted_stats["Kills"] = self.ave_stats['totalChampionKills']
+        self.converted_stats["Deaths"] = self.ave_stats['totalDeathsPerSession']
+        self.converted_stats["Assists"] = self.ave_stats['totalAssists']
+        self.converted_stats["CS"] = self.ave_stats['totalMinionKills']
+        self.converted_stats["Towers"] = self.ave_stats['totalTurretsKilled']
+        self.converted_stats["Gold"] = self.ave_stats['totalGoldEarned']
+        if self.ave_stats['totalDeathsPerSession'] != 0:
+            self.converted_stats["KDA"] = round((self.ave_stats['totalChampionKills'] + self.ave_stats['totalAssists'])/self.ave_stats['totalDeathsPerSession'], 2)
+        else:
+            self.converted_stats["KDA"] = round((self.ave_stats['totalChampionKills'] + self.ave_stats['totalAssists'])/1, 2)
         return self.converted_stats
-                                    
-##        return 
-
-
-
-
-    
+        
+##        self.converted_stats["Total Games"] = self.ave_stats['totalSessionsPlayed']
+##        self.converted_stats["Win Rate"] = round(((self.champ_stats['totalSessionsWon']/self.champ_stats['totalSessionsPlayed'])*100), 2)
+##        self.converted_stats["Ave Kills"] = self.ave_stats['totalChampionKills']
+##        self.converted_stats["Ave Deaths"] = self.ave_stats['totalDeathsPerSession']
+##        self.converted_stats["Ave Assists"] = self.ave_stats['totalAssists']
+##        self.converted_stats["Ave CS"] = self.ave_stats['totalMinionKills']
+##        self.converted_stats["Ave Towers"] = self.ave_stats['totalTurretsKilled']
+##        self.converted_stats["Ave Gold"] = self.ave_stats['totalGoldEarned']
+##        self.converted_stats["KDA"] = round((self.ave_stats['totalChampionKills'] + self.ave_stats['totalAssists'])/self.ave_stats['totalDeathsPerSession'], 2)

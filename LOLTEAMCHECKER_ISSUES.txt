@@ -102,17 +102,31 @@ More importantly, make sure things are handled in the appropriate places.
 10. Reduce redundant api calls - i.e. if "Go" is pressed, and the summoner
 exists, then ranked stats will be saved in the Model. No need to recall the
 api when a legitimate champion (one that the summoner has played) has stats.
+DONE
 
 11. If a champ's stats are successfully called, the next unsuccessful champion
 call will not produce an error. Fix:
 (1) Make sure error message pops up.
 (2)	Reset all fields to "0".
+DONE
 
 12. IMPORTANT:
 Model needs to be restructured in terms of its try...except loops - i.e. they
 should stop after an exception.
+DONE
 
 13. Need a test suite for all possible conditions.
+
+14. Rework the model in terms of .data and .final_stats to accommodate:
+1. _get_summary_stats() fails if called multiple times because .final_stats
+will have dicts that have 'Total Games' and dicts that don't.
+2. Uniform naming across basic JSON stats and final stats, like 
+"totalSessionsPlayed" vs "Total Games" - EWAve is the issue
+3. If a player that was initially checked does not comprise the 5 now checked,
+make sure he isn't added to the totals, this actually applies to all players 
+looked up during the session. i.e. find a way to capture current state. 
+
+15. "get all stats" and "get summary stats" don't always work!
 ===============================================================================
 Small QOL Stuff:
 -------------------
@@ -137,6 +151,14 @@ to label head sizes).
 
 7. Use a version of print "{y:2f}".format(y=0.13452) instead of explicit 
 rounding?
+
+8. Edit all rehashing dictionary lookups, change from:
+for k in d:
+    print k, d[k]
+	
+to:
+for k, v in d.items():
+    print k, v
 
 Misc.:
 

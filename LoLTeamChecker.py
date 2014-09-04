@@ -1,7 +1,7 @@
 # -*- coding: latin-1 -*-
 
 # script to check LoLTeamCheckerGUI
-
+from __future__ import division # must be first import
 from riotapi_py import *
 from rankeddata import GrabRankedData
 from staticdata import GrabStaticData

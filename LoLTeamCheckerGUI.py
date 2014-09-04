@@ -23,13 +23,14 @@ class LoLTeamCheckerGUI(tk.Frame):
         self.user_values = {}
         self.header_values = {}
         self.row_buttons = []
+        self.master.title("LoL Team Checker")
 
         # Please check how to code this by PEP standards
         self.default_values = {'ln': ["Summoner Name", "Champion Name"],
-                               'rn': ["Total Games", "Win Rate", "Ave "
-                                      "Kills", "Ave Deaths", "Ave "
-                                      "Assists", "Ave CS", "Ave Towers",
-                                      "Ave Gold", "KDA", "Prediction"],
+                               'rn': ["Games", "Win Rate", "Kills",
+                                      "Deaths", "Assists", "CS",
+                                      "Towers", "Gold", "KDA",
+                                      "Prediction"],
                                'li': {"Names":['{s}'.format(s="Summoner"
                                                             " ") + str(i)
                                                for i in range(1, 6)],
@@ -49,6 +50,7 @@ class LoLTeamCheckerGUI(tk.Frame):
         self._create_button_frame()
         self._create_right_info_frame(self.default_values['rn'])
         self._create_mid_region_frame() # mid, top, frame created by column
+        self._create_summary_frame()
 ##        configuration, not explicitly.
         # Configure frames  
 ##        self.master.grid()
@@ -56,14 +58,21 @@ class LoLTeamCheckerGUI(tk.Frame):
 ##        top.grid(0, "ew")
         top.columnconfigure(0, weight=1, minsize=100)
         top.columnconfigure(1, weight=1, minsize=75)
-        top.columnconfigure(2, weight=2, minsize=100)
+        top.columnconfigure(2, weight=1, minsize=100)
 ##        top.rowconfigure(0, weight=1)
         top.rowconfigure(1, weight=1)
+        top.rowconfigure(2, weight=2)
 ##        self.columnconfigure(0, weight=1)
 ##        self.columnconfigure(1, weight=1)
 ##        self.rowconfigure(0, weight=0)
         self.grid(sticky="ew")
 ##        self.master.title("jkshd")
+
+    def _create_frames(self, column, rows):
+        """Empty method for now, but might be more general. Need to
+        decide whether I need more than columns/rows as arguments -
+        what **kwargs?"""
+        pass
         
 
     def _create_left_name_frame(self, headers):
@@ -101,7 +110,7 @@ class LoLTeamCheckerGUI(tk.Frame):
             self.labels[1].append(tk.Label(self.frames[1], text=name,
                                            relief="sunken"))
             self.labels[1][i].grid(column=i, row=0, sticky="ew")
-            self.frames[1].columnconfigure(i, weight=1, minsize=100)
+            self.frames[1].columnconfigure(i, weight=1, minsize=50)
 
         self.frames[1].grid(column=2, row=0, sticky="ew")
 
@@ -168,7 +177,7 @@ class LoLTeamCheckerGUI(tk.Frame):
         self.labels.append([])
 
         for column, name in enumerate(headers):
-            self.frames[4].columnconfigure(column, weight=1, minsize=100)
+            self.frames[4].columnconfigure(column, weight=1, minsize=50)
             self.header_values[name] = []
             for row in range(5):
                 self.header_values[name].append(self.default_values
@@ -188,6 +197,16 @@ class LoLTeamCheckerGUI(tk.Frame):
                 self.frames[4].rowconfigure(row, weight=1, minsize=50)
         self.frames[4].grid(column=2, row=1, sticky="ew")
 
+    def _create_summary_frame(self):
+        """Creates the summary frame, bottom, total, frame."""
+        self.frames.append(tk.Frame(self.master))
+
+        self.frames[6].grid(column=0, row=2, sticky="ew")
+        self.go_button = (tk.Button(self.frames[6], text="Get Summary Stats"))
+        self.go_button.grid(column=0, row=0)
+        self.getall_button = (tk.Button(self.frames[6], text="Get all indiv stats"))
+        self.getall_button.grid(column=1, row=0)
+
     def _set_right_info_row_values(self, row, values):
         """Takes a values dict from the controller, and lays it into
         those labels."""
@@ -198,6 +217,14 @@ class LoLTeamCheckerGUI(tk.Frame):
         """Gets the user values (summoner and champ names)."""
         return [self.user_values['Summoner Name'][row].get(), self.user_values['Champion Name'][row].get()]
 
+    def _get_all_summoners(self):
+        """Gets all current summoner names. Useful for snapshots."""
+        return [self.user_values['Summoner Name'][row].get() for row, obj in enumerate(self.user_values['Summoner Name'])]
+
+    def _get_all_champs(self):
+        """Gets all current champion names."""
+        return [self.user_values['Champion Name'][row].get() for row, obj in enumerate(self.user_values['Champion Name'])]
+    
     def _get_region_value(self):
         """Gets the region value."""
         return self.region_option.get()
