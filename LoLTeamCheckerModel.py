@@ -98,7 +98,7 @@ class LoLTeamCheckerModel:
                         None}) # find best way to do this
 ##        self.num_games = sum([self.final_stats[i]['Total Games'] for i in self.final_stats if 'Total Games' in self.final_stats[i].keys()])
 
-        self.num_games = sum([self.final_stats[name]['Total Games'] for name in summoner_names])
+        self.num_games = sum([self.final_stats[name]['Games'] for name in summoner_names])
 
 
         
@@ -117,8 +117,8 @@ class LoLTeamCheckerModel:
             if hasattr(self.data[name], 'champ_stats'):
                 self.ew_data += Counter(self.data[name].champ_stats)
 
-        self.ave_stats = {'EWAve': {key: round((self.ew_data[key]/self.num_games), 2) for key in self.ew_data}, 'Ave': {key: round((self.nonew_data[key]/self.num), 2) for key in self.nonew_data}}
-            
+        self.ave_stats = {'Ave': {key: round((self.nonew_data[key]/self.num), 2) for key in self.nonew_data}}
+        self.ave_stats['EWAve'] = self._convert_bad_stats(self.ew_data)    
         print "Equally weighted averages: "
         for k, v in self.ave_stats['EWAve'].items():
             print k, ": ", v
@@ -131,7 +131,23 @@ class LoLTeamCheckerModel:
 
 ##        print self.final_stats['EWAve']
 ##        print self.final_stats['Ave']
-
+    def _convert_bad_stats(self, ew_data):
+        """Method for converting equally weighted averages into
+        standard format, because it has awkward Riot JSON fields."""
+        new_data = {}
+        new_data['Gold'] = round((ew_data['totalGoldEarned']/self.num_games), 2)
+        new_data['Games'] = round((self.num_games/self.num), 2)
+        new_data['Kills'] = round((ew_data['totalChampionKills']/self.num_games), 2)
+        new_data['Assists'] = round((ew_data['totalAssists']/self.num_games), 2)
+        new_data['Deaths'] = round((ew_data['totalDeathsPerSession']/self.num_games), 2)
+        new_data['CS'] = round((ew_data['totalMinionKills']/self.num_games), 2)
+        new_data['Win Rate'] = round(((ew_data['totalSessionsWon']/self.num_games)*100), 2)
+        new_data['Towers'] = round((ew_data['totalTurretsKilled']/self.num_games), 2)
+        if ew_data['totalDeathsPerSession'] != 0:
+            new_data['KDA'] = round(((ew_data['totalChampionKills'] + ew_data['totalAssists'])/ew_data['totalDeathsPerSession']), 2)
+        else:
+            new_data['KDA'] = round(((ew_data['totalChampionKills'] + ew_data['totalAssists'])/1), 2)
+        return new_data
             
     def _update(self):
         """Updates when the region is not the default."""

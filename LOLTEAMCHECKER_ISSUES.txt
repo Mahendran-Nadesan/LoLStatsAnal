@@ -124,9 +124,18 @@ will have dicts that have 'Total Games' and dicts that don't.
 "totalSessionsPlayed" vs "Total Games" - EWAve is the issue
 3. If a player that was initially checked does not comprise the 5 now checked,
 make sure he isn't added to the totals, this actually applies to all players 
-looked up during the session. i.e. find a way to capture current state. 
+looked up during the session. i.e. find a way to capture current state. DONE
 
-15. "get all stats" and "get summary stats" don't always work!
+15. "get all stats" and "get summary stats" don't always work! FIXED
+
+16. Add a boolean flag so that certain errors are only thrown (hence error
+boxes only pop up) when _process_line is accessed on its own, not via 
+_process_all.
+
+17. Fix dicts, handling of _set_summary_values() or whatever it's called. 
+DONE?
+
+18. Write some tests/just test that EWA[KDA] is being worked out properly.
 ===============================================================================
 Small QOL Stuff:
 -------------------
@@ -160,6 +169,8 @@ to:
 for k, v in d.items():
     print k, v
 
+9. Sort out sub-framing of summary frame.	
+	
 Misc.:
 
 1. Create all frames [x]

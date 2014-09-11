@@ -49,7 +49,7 @@ class LoLTeamCheckerController:
             if summoner in self.model.final_stats:
                 print
                 print "Setting values for {s}: {c}.".format(s=summoner, c=champ)
-                print "Values are: ", self.final_stats[summoner]
+                print "Values are: ", self.model.final_stats[summoner]
                 print
                 self.gui._set_right_info_row_values(summoner_names.index(summoner), self.model.final_stats[summoner])
                 
@@ -57,8 +57,12 @@ class LoLTeamCheckerController:
     def _process_summary(self):
         """Runs the methods for processing the average/summary
         pane."""
+        print "in process summary"
         self._process_all()
+        print "getting summary stats"
         self.model._get_summary_stats(self.gui._get_all_summoners(), self.gui._get_all_champs())
+        print "setting summary stats"
+        self.gui._set_summary_values(self.model.ave_stats['EWAve'], self.model.ave_stats['Ave'])
         
     def _set_bindings(self):
         """Set bindings for buttons in GUI."""

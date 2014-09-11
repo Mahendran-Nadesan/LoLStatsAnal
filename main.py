@@ -24,7 +24,7 @@ import collections
 # Add RiotLimit...
 api_key = "e20154f8-3601-40ac-ae35-5af13e62cc8c" 
 region = "euw" 
-versions = {"gsbn": "v1.4", "gsbid": "v1.4", "ggbid": "v1.3", "grsbid": "v1.3", "sgcbid": "v1.2"} 
+versions = {"gmhbid": "v2.2", "gsbn": "v1.4", "gsbid": "v1.4", "ggbid": "v1.3", "grsbid": "v1.3", "sgcbid": "v1.2"} 
 
 api_instance = RiotApiPy(api_key, versions, region) 
 ##api_instance = RiotApiPy() 
@@ -35,7 +35,8 @@ api_instance = RiotApiPy(api_key, versions, region)
 # class and get called by the GUI 
 
 
-summoner_name = "Johnsên" 
+##summoner_name = "Johnsên"
+summoner_name = 'NadsOfMahen'
 summoner = api_instance.get_summoners_by_name(summoner_name, "euw") 
 ##playerid = str(summoner['mindfreakz']['id'])
 ##playerid = str(summoner[summoner_name.lower()]['id'])
