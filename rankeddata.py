@@ -52,7 +52,7 @@ class GrabRankedData:
         self.ave_stats = {}
         for stat in champ_stats:
             self.ave_stats[stat] = round(champ_stats[stat]/num_games, 2)
-        champ_stats['totalSessionsPlayed'] = num_games
+        self.champ_stats['totalSessionsPlayed'] = num_games
         self.ave_stats['totalSessionsPlayed'] = num_games
         return self.ave_stats
 

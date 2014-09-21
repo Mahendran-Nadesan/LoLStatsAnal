@@ -63,42 +63,59 @@ class LoLTeamCheckerModel:
         self.summoner_name = summoner_name
         self.champ_name = champ_name
 ##        self.final_stats[summoner_name]= {}
-        if self.summoner_name == "":
-            self.error = "No summoner name given."
+
+##        if do_all is True and self.summoner_name is None:
+        if self.summoner_name is "":
+            self.error = "No summoner name entered."
             raise self.error
-        if self.summoner_name not in self.summoners:
+        if self.summoner_name not in self.summoners and self.summoner_name is not "":
             try:
+                print "trying..._get_summoner_data()"
                 self._get_summoner_data()
             except:
                 self.error = "No such summoner: {s}".format(s=summoner_name)
                 self.summoners.pop(self.summoner_name)
                 self.final_stats.pop(summoner_name)
+                raise self.error
         if self.summoner_name not in self.data:
             try:
+                print "trying..._get_ranked_data()"
                 self._get_ranked_data()
             except:
                 self.error = "No ranked stats this season."
                 raise self.error
-        try:
-            self.data[self.summoner_name].make_relevant(self.data[self.summoner_name].get_stats_by_champid(self.staticdata.get_champid(self.champ_name)))
-            self.data[self.summoner_name].get_averages(self.data[self.summoner_name].relevant_stats)
-            self.final_stats[self.summoner_name] = Counter(self.data[self.summoner_name].convert())
-        except:
-            self.error = "No data for champ"
-            self.final_stats.pop(summoner_name)
-            self.final_stats[self.summoner_name] = Counter({k: 0 for k in self.data[self.summoner_name].converted_stats_names})
-            raise self.error
+        if self.summoner_name in self.data:
+            if not self.final_stats.has_key(self.summoner_name):
+                print "making final_stats[{s}]".format(s=self.summoner_name)
+                self.final_stats[self.summoner_name] = {}
+            try:
+                self.data[self.summoner_name].make_relevant(self.data[self.summoner_name].get_stats_by_champid(self.staticdata.get_champid(self.champ_name)))
+                self.data[self.summoner_name].get_averages(self.data[self.summoner_name].relevant_stats)
+                self.final_stats[self.summoner_name][self.champ_name] = Counter(self.data[self.summoner_name].convert())
+            except:
+                print "in exception section of data loop..."
+                self.error = "No data for champ"
+                self.final_stats.pop(summoner_name)
+                self.final_stats[self.summoner_name][self.champ_name] = Counter({k: 0 for k in self.data[self.summoner_name].converted_stats_names})
+                raise self.error
+        print "it got to the end...!"
+            
+##        if do_all is False and self.error:
+##            raise self.error
 
     def _get_summary_stats(self, summoner_names, champ_names):
         """Method for averaging team stats based on summoners already
         retrieved."""
-        
+
+        summoner_names = [name for name in summoner_names if name is not ""]
+        champ_names = [name for name in champ_names if name is not ""]
+
+            
 ##        self.num = len([len(self.data) for i in self.data if self.data[i] is not None])
-        self.num = len({i for i in self.final_stats if self.final_stats[i] is not
-                        None}) # find best way to do this
+        self.num = len({i for i in summoner_names if i is not None}) # find best way to do this
 ##        self.num_games = sum([self.final_stats[i]['Total Games'] for i in self.final_stats if 'Total Games' in self.final_stats[i].keys()])
 
-        self.num_games = sum([self.final_stats[name]['Games'] for name in summoner_names])
+        self.num_games = sum([self.final_stats[name][champ]['Games'] for name in summoner_names if name is not "" for champ in self.final_stats[name]])
 
 
         
@@ -110,12 +127,12 @@ class LoLTeamCheckerModel:
         self.ew_data = Counter()
         self.nonew_data = Counter()
         
-        for name in summoner_names:
-            self.nonew_data += self.final_stats[name]
+        for num, name in enumerate(summoner_names):
+            self.nonew_data += self.final_stats[name][champ_names[num]]
 
-        for name in summoner_names:
-            if hasattr(self.data[name], 'champ_stats'):
-                self.ew_data += Counter(self.data[name].champ_stats)
+        for num, name in enumerate(summoner_names):
+##            if hasattr(self.data[name], 'champ_stats'):
+            self.ew_data += Counter(self.data[name].get_stats_by_champid(self.staticdata.get_champid(champ_names[num])))
 
         self.ave_stats = {'Ave': {key: round((self.nonew_data[key]/self.num), 2) for key in self.nonew_data}}
         self.ave_stats['EWAve'] = self._convert_bad_stats(self.ew_data)    

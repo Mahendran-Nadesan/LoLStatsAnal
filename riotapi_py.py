@@ -100,13 +100,8 @@ class RiotApiPy:
                         return self.r.json()
                 except:
                         self.error = RiotApiPyException(self.r.status_code)
-                        raise self.error
-##
-##                if self.r.status_code != 200:
-##                        self.error = self.r.status_code
-##                        return self.error
-##                else:
-##                        return self.r.json()
+                        raise self.error # This is an important line
+
 
         def get_summoners_by_name(self, summoner_list, static=False):
                 if str(type(summoner_list)) == "<type \'list\'>":

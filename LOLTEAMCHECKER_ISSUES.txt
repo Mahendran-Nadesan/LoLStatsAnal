@@ -126,16 +126,26 @@ will have dicts that have 'Total Games' and dicts that don't.
 make sure he isn't added to the totals, this actually applies to all players 
 looked up during the session. i.e. find a way to capture current state. DONE
 
-15. "get all stats" and "get summary stats" don't always work! FIXED
+15. "get all stats" and "get summary stats" don't always work! FIXED,
+but sometimes (when?) don't update individual lines
 
 16. Add a boolean flag so that certain errors are only thrown (hence error
 boxes only pop up) when _process_line is accessed on its own, not via 
-_process_all.
+_process_all. DONE DIFFERENTLY (no flag)
 
 17. Fix dicts, handling of _set_summary_values() or whatever it's called. 
 DONE?
 
 18. Write some tests/just test that EWA[KDA] is being worked out properly.
+
+19. It appears as if having multiple champs for one summoner messes up 
+calculations (first hypothesis: final_stats needs a [name] key, like:
+
+final_stats[summoner][champ][stats] (where stats is a list) instead of:
+
+final_stats[summoner][champ stats] (where champ_stats is the list)). DONE
+
+20. Rework EWAve and Ave, that shit is messed up.
 ===============================================================================
 Small QOL Stuff:
 -------------------

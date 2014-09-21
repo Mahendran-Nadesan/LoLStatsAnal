@@ -1,7 +1,7 @@
-# -*- coding: latin-1 -*-
+# -*- coding: utf-8 -*-
 
 """The GUI for LoLTeamChecker
-
+dzień świra
 The GUI has rows for each champ, allowing for entry of summoner name
 and champion. When appropriate buttons are pressed, average/relevant
 data is returned."""
@@ -145,7 +145,7 @@ class LoLTeamCheckerGUI(tk.Frame):
 ##                                                [self.default_values
 ##                                                 ['li'].keys()[column]]
 ##                                                [row])
-                self.user_values[name][row].set("")
+##                self.user_values[name][row].set("")
                 self.entries[0].append(tk.Entry(self.frames[2],
                                                 textvariable=self.
                                                 user_values[name][row]))
@@ -248,19 +248,19 @@ class LoLTeamCheckerGUI(tk.Frame):
 
         for row_number, row in enumerate(self.summary_values.keys()):
             self.summary_values[row] = {}
-            print "row number: ", row_number
+##            print "row number: ", row_number
             
             for column, name in enumerate(self.default_values['rn']):
-                print "column number: ", column
-                print (row_number+(column*5))
+##                print "column number: ", column
+##                print (row_number+(column*5))
                 self.frames[8].columnconfigure(column, weight=1, minsize=50)
 ##                self.summary_values[row].append(self.default_values
 ##                                                ['rv']
 ##                                                [row_number+(column*5)])
-                self.summary_values[row][name] = (self.default_values
-                                                  ['rv']
-                                                  [row_number+
-                                                   (column*5)])
+##                self.summary_values[row][name] = (self.default_values
+##                                                  ['rv']
+##                                                  [row_number+
+##                                                   (column*5)])
                 if column == 9:
                     self.summary_values[row][name] = tk.StringVar()
                 else:
