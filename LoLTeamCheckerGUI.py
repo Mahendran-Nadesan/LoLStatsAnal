@@ -312,15 +312,15 @@ class LoLTeamCheckerGUI(tk.Frame):
         
     def _get_user_values(self, row):
         """Gets the user values (summoner and champ names)."""
-        return [self.user_values['Summoner Name'][row].get(), self.user_values['Champion Name'][row].get()]
+        return [self.user_values['Summoner Name'][row].get().lower(), self.user_values['Champion Name'][row].get().lower()]
 
     def _get_all_summoners(self):
         """Gets all current summoner names. Useful for snapshots."""
-        return [self.user_values['Summoner Name'][row].get() for row, obj in enumerate(self.user_values['Summoner Name'])]
+        return [self.user_values['Summoner Name'][row].get().lower() for row, obj in enumerate(self.user_values['Summoner Name'])]
 
     def _get_all_champs(self):
         """Gets all current champion names."""
-        return [self.user_values['Champion Name'][row].get() for row, obj in enumerate(self.user_values['Champion Name'])]
+        return [self.user_values['Champion Name'][row].get().lower() for row, obj in enumerate(self.user_values['Champion Name'])]
     
     def _get_region_value(self):
         """Gets the region value."""

@@ -156,6 +156,11 @@ form - i.e.:
 and, 
 (2) make sure the entry from the GUI gets converted before being checked.
 
+DONE - was harder, and implemented in a weirder way than I initially thought.
+
+So, maybe staticdata needs to have its dicts done in the form 
+{{name: "Amumu", "id": ??}, } so I can .lower() values instead of keys?)
+
 2. Write checks for region (currently LoLTeamCheckerController has "euw" 
 hardcoded for its self.api_instance...) DONE
 
@@ -180,7 +185,36 @@ for k, v in d.items():
     print k, v
 
 9. Sort out sub-framing of summary frame.	
+
+10. Make sure summoner names have a case-insensitive feature, i.e. 
+if "NadsOfMahen" has been searched, don't re-lookup "nadsofmahen" if entered.
+Best way is probably to change all storage(like .model.data and 
+.model.final_stats), and checks (if summoner in .model.data, etc.), into 
+lower-case versions.
 	
 Misc.:
 
 1. Create all frames [x]
+===============================================================================
+Things I learned/to ponder:
+---------------------------
+1. Mixing dicts, lists:
+One of the more annoying issues I had was finding a way to capture the current
+5 names of summoners and champs, and use comprehensions when those 5 summoner 
+names weren't unique (i.e. 5 of the same person). The method to grab the names 
+would return a list, [x, x, x, x, x]. But the different champs for that 
+summoner (x) would be stored as:
+
+.model.final_stats[x][champ_a],
+.model.final_stats[x][champ_b], etc.
+
+So if I wanted the total number of games for the rare case of one summoner, 
+using a sum over the list comprehension:
+
+num_games = sum([[name][champ]['Games'] for name in names for champ in champs])
+
+would find .model.final_stats[x][champ_a]...[champ_b], then iterate over the 
+length of the name list [x, x, x, x, x]. Since this is a unique case, and a 
+rare one, I could have written a special catch, but I did it using zip. That
+way, I preserved the original name gets as lists, not dicts 
+(i.e. {x, x, x, x, x}).

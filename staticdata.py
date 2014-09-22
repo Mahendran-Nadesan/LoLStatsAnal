@@ -40,15 +40,19 @@ class GrabStaticData:
     def get_champid(self, champname):
         """Return the ID of a champ by looking it up in the new
         dict."""
+        # This needs to be edited to return for fname list too.
         return self.champs_by_name[champname]
+        
 
     def _sort(self):
         """Make two list of all champs for easier access (instead of
         always calling using the API)"""
         self.champs_by_name = {}
         self.champs_by_id = {}
+        self.champs_by_fname = {}
         for i in self.champ_list:
             self.champs_by_name[self.champ_list[i]['name']] = self.champ_list[i]['id']
             self.champs_by_id[self.champ_list[i]['id']] = str(self.champ_list[i]['name'])
+            self.champs_by_fname[i] = self.champ_list[i]['id']
         
         

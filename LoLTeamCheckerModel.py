@@ -89,7 +89,13 @@ class LoLTeamCheckerModel:
                 print "making final_stats[{s}]".format(s=self.summoner_name)
                 self.final_stats[self.summoner_name] = {}
             try:
-                self.data[self.summoner_name].make_relevant(self.data[self.summoner_name].get_stats_by_champid(self.staticdata.get_champid(self.champ_name)))
+                self.champ_id = [self.staticdata.champs_by_name[i] for i in self.staticdata.champs_by_name if i.lower() == self.champ_name.lower()] or [self.staticdata.champ_list[i]['id'] for i in self.staticdata.champ_list.keys() if i.lower() == self.champ_name.lower()]
+                self.champ_id = self.champ_id.pop(0)    # There must be a better way to do this
+##                    self.champ_id = [myapp.model.staticdata.champs_by_name[i] for i in myapp.model.staticdata.champs_by_name if i.lower() == self.champ_name.lower()]
+##                
+##                    self.champ_id = [myapp.model.staticdata.champ_list[i]['id'] for i in myapp.model.staticdata.champ_list.keys() if i.lower() == self.champ_name.lower()]
+##                self.data[self.summoner_name].make_relevant(self.data[self.summoner_name].get_stats_by_champid(self.staticdata.get_champid(self.champ_name)))
+                self.data[self.summoner_name].make_relevant(self.data[self.summoner_name].get_stats_by_champid(self.champ_id))
                 self.data[self.summoner_name].get_averages(self.data[self.summoner_name].relevant_stats)
                 self.final_stats[self.summoner_name][self.champ_name] = Counter(self.data[self.summoner_name].convert())
             except:
@@ -107,16 +113,16 @@ class LoLTeamCheckerModel:
         """Method for averaging team stats based on summoners already
         retrieved."""
 
-        summoner_names = [name for name in summoner_names if name is not ""]
-        champ_names = [name for name in champ_names if name is not ""]
+        self.summoner_names = [name for name in summoner_names if name is not ""]
+        self.champ_names = [name for name in champ_names if name is not ""]
 
             
 ##        self.num = len([len(self.data) for i in self.data if self.data[i] is not None])
-        self.num = len({i for i in summoner_names if i is not None}) # find best way to do this
+##        self.num = len({i for i in summoner_names if i is not None}) # find best way to do this
 ##        self.num_games = sum([self.final_stats[i]['Total Games'] for i in self.final_stats if 'Total Games' in self.final_stats[i].keys()])
-
-        self.num_games = sum([self.final_stats[name][champ]['Games'] for name in summoner_names if name is not "" for champ in self.final_stats[name]])
-
+        self.num = len(self.summoner_names)
+        self.num_games = sum([self.final_stats[name][champ]['Games'] for name, champ in zip(self.summoner_names, self.champ_names)])
+        print "Number of games is :", self.num_games
 
         
 ##        newdict = dict((x, {k: 0 for k in range(3)}) for x in range(2))
@@ -127,12 +133,14 @@ class LoLTeamCheckerModel:
         self.ew_data = Counter()
         self.nonew_data = Counter()
         
-        for num, name in enumerate(summoner_names):
+        for num, name in enumerate(self.summoner_names):
             self.nonew_data += self.final_stats[name][champ_names[num]]
 
-        for num, name in enumerate(summoner_names):
+        for num, name in enumerate(self.summoner_names):
 ##            if hasattr(self.data[name], 'champ_stats'):
-            self.ew_data += Counter(self.data[name].get_stats_by_champid(self.staticdata.get_champid(champ_names[num])))
+            self.champ_id = [self.staticdata.champs_by_name[i] for i in self.staticdata.champs_by_name if i.lower() == self.champ_names[num].lower()] or [self.staticdata.champ_list[i]['id'] for i in self.staticdata.champ_list.keys() if i.lower() == self.champ_names[num].lower()]
+            self.champ_id = self.champ_id.pop(0) 
+            self.ew_data += Counter(self.data[name].get_stats_by_champid(self.champ_id))
 
         self.ave_stats = {'Ave': {key: round((self.nonew_data[key]/self.num), 2) for key in self.nonew_data}}
         self.ave_stats['EWAve'] = self._convert_bad_stats(self.ew_data)    
