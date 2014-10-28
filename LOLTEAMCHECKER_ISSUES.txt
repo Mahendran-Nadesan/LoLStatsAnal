@@ -80,6 +80,7 @@ model.py
 def 
 
 7. Deal with weird character encodings. DONE (need to test)
+not thorough - try: u'aet\xf8s'
 
 8. Find out how people do floats as (Tk.var()). Either:
 

@@ -63,7 +63,10 @@ class LoLTeamCheckerModel:
         self.summoner_name = summoner_name
         self.champ_name = champ_name
 ##        self.final_stats[summoner_name]= {}
-
+        print
+        print "current name {n}, current champ {c}".format(n=summoner_name, c=champ_name)
+        print "current final stats are: ", self.final_stats
+        print
 ##        if do_all is True and self.summoner_name is None:
         if self.summoner_name is "":
             self.error = "No summoner name entered."
@@ -83,6 +86,7 @@ class LoLTeamCheckerModel:
                 self._get_ranked_data()
             except:
                 self.error = "No ranked stats this season."
+                self.data.pop(summoner_name)
                 raise self.error
         if self.summoner_name in self.data:
             if not self.final_stats.has_key(self.summoner_name):
@@ -101,7 +105,7 @@ class LoLTeamCheckerModel:
             except:
                 print "in exception section of data loop..."
                 self.error = "No data for champ"
-                self.final_stats.pop(summoner_name)
+##                self.final_stats.pop(summoner_name)
                 self.final_stats[self.summoner_name][self.champ_name] = Counter({k: 0 for k in self.data[self.summoner_name].converted_stats_names})
                 raise self.error
         print "it got to the end...!"
@@ -113,15 +117,22 @@ class LoLTeamCheckerModel:
         """Method for averaging team stats based on summoners already
         retrieved."""
 
-        self.summoner_names = [name for name in summoner_names if name is not ""]
-        self.champ_names = [name for name in champ_names if name is not ""]
-
+        self.summoner_names = [name for name in summoner_names]
+        self.champ_names = [name for name in champ_names]
+        
+        # insert checker here
+        self._check_entries()
             
 ##        self.num = len([len(self.data) for i in self.data if self.data[i] is not None])
 ##        self.num = len({i for i in summoner_names if i is not None}) # find best way to do this
 ##        self.num_games = sum([self.final_stats[i]['Total Games'] for i in self.final_stats if 'Total Games' in self.final_stats[i].keys()])
-        self.num = len(self.summoner_names)
-        self.num_games = sum([self.final_stats[name][champ]['Games'] for name, champ in zip(self.summoner_names, self.champ_names)])
+
+        
+        self.num_data = [self.final_stats[name][champ]['Games'] for name, champ in self.data_pairs if self.final_stats[name][champ]['Games'] is not 0]
+        self.num_games = sum(self.num_data)
+        self.num = len(self.num_data)
+
+        print self.num_data
         print "Number of games is :", self.num_games
 
         
@@ -133,14 +144,23 @@ class LoLTeamCheckerModel:
         self.ew_data = Counter()
         self.nonew_data = Counter()
         
-        for num, name in enumerate(self.summoner_names):
-            self.nonew_data += self.final_stats[name][champ_names[num]]
+##        for num, name in enumerate(self.summoner_names):
+##            self.nonew_data += self.final_stats[name][champ_names[num]]
 
-        for num, name in enumerate(self.summoner_names):
-##            if hasattr(self.data[name], 'champ_stats'):
-            self.champ_id = [self.staticdata.champs_by_name[i] for i in self.staticdata.champs_by_name if i.lower() == self.champ_names[num].lower()] or [self.staticdata.champ_list[i]['id'] for i in self.staticdata.champ_list.keys() if i.lower() == self.champ_names[num].lower()]
+        for name, champ in self.data_pairs:
+            self.nonew_data += self.final_stats[name][champ]
+            self.champ_id = [self.staticdata.champs_by_name[i] for i in self.staticdata.champs_by_name if i.lower() == champ.lower()] or [self.staticdata.champ_list[i]['id'] for i in self.staticdata.champ_list.keys() if i.lower() == champ.lower()]
             self.champ_id = self.champ_id.pop(0) 
             self.ew_data += Counter(self.data[name].get_stats_by_champid(self.champ_id))
+
+        
+
+##        for num, name in enumerate(self.summoner_names):
+####            if hasattr(self.data[name], 'champ_stats'):
+##            if self.final_stats[name][self.champ_names[num]]['Games'] != 0:
+##                self.champ_id = [self.staticdata.champs_by_name[i] for i in self.staticdata.champs_by_name if i.lower() == self.champ_names[num].lower()] or [self.staticdata.champ_list[i]['id'] for i in self.staticdata.champ_list.keys() if i.lower() == self.champ_names[num].lower()]
+##                self.champ_id = self.champ_id.pop(0) 
+##                self.ew_data += Counter(self.data[name].get_stats_by_champid(self.champ_id))
 
         self.ave_stats = {'Ave': {key: round((self.nonew_data[key]/self.num), 2) for key in self.nonew_data}}
         self.ave_stats['EWAve'] = self._convert_bad_stats(self.ew_data)    
@@ -173,6 +193,24 @@ class LoLTeamCheckerModel:
         else:
             new_data['KDA'] = round(((ew_data['totalChampionKills'] + ew_data['totalAssists'])/1), 2)
         return new_data
+
+    def _check_entries(self):
+        """Method for removing bad entries in final stats based on
+        same requirements as _get_champ_stats() so that the
+        summary/ave stats are still calculated correctly."""
+        ## Things to check for: 1. Summoner name exists in final_stats 2. 
+        
+        self.backup_final_stats = self.final_stats
+        self.data_pairs = []
+        for name, champ in zip(self.summoner_names, self.champ_names):
+            if name in self.final_stats:
+                if champ in self.final_stats[name]:
+                    if self.final_stats[name][champ]['Games'] is not 0:
+                        self.data_pairs.append((name, champ))
+                         
+                    
+
+
             
     def _update(self):
         """Updates when the region is not the default."""
